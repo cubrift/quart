@@ -44,7 +44,7 @@ Create a `.env` file in the root directory of your project and configure the req
 
 ```env
 # Required for pairing code
-PHONENUMBER=your_phone_number_here
+PHONE_NUMBER=your_phone_number_here
 
 # Required for OpenAI API model responses
 OPEN_API_KEY=your_openai_api_key_here
