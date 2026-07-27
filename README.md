@@ -103,12 +103,16 @@ pm2 save
 ---
 
 ## Contributing & Prompt Engineering
-Contributions are extremely welcome—especially around system instruction engineering!
+Contributions are extremely welcome: especially around system instruction engineering!
 
 ### System Prompt Optimization
 The current challenge is balancing low token costs against strict instruction adherence:
 - Token Efficiency: We want system instructions that maximize OpenAI Prompt Caching benefits (reusing static prefix context across requests to trigger 50%+ discount on input tokens).
 - Instruction Quality: Ensuring Quart strictly obeys persona rules, tool triggering criteria, and output limits without bloating prompt length.
+
+### Refactorization
+Any refactoring, whether that's cleaning up spaghetti code, would be greatly appreciated!
+Our code is always somewhat messy, so making everything *neat* and *modular* is the definitely the way to go for this project 😎.
 
 If you have experience crafting concise, high-density system prompts or optimizing LLM context structures for prompt caching, please open a Pull Request or Issue!
 
