@@ -5,7 +5,7 @@ const { MODEL_NAME, EDIT_INTERVAL, CHECK_MODEL_NAME, MAX_MESSAGE_CONTEXT } = req
 const { getSystemInstructions } = require("./SystemInstructions");
 const schema = require("./schemas/AISchema");
 
-const { generateText, streamText, Output, tool } = require("ai");
+const { generateText, streamText, Output } = require("ai");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
 const { createOpenAI } = require('@ai-sdk/openai');
 const { getRealLid, extractImageData } = require('../../Util');
@@ -22,6 +22,8 @@ module.exports = async function messageAI(sock, msg, polls) {
   
   const msgText = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || "";
   if ((!msgText && !msg.message?.imageMessage) || msg.message?.reactionMessage || isStatus) return;
+
+  const system = await getSystemInstructions(sock, jid);
 
   if (msgText === ".reset") {
     saveMessage(jid, "assistant", "I am now resetting myself and my tone with these instructions: " + system);
@@ -70,8 +72,6 @@ module.exports = async function messageAI(sock, msg, polls) {
   await sock.sendPresenceUpdate('composing', jid);
 
   let partialOutputStream = null;
-
-  const system = await getSystemInstructions(sock, jid);
 
   try {
     ({ partialOutputStream } = await streamText({
@@ -131,7 +131,7 @@ module.exports = async function messageAI(sock, msg, polls) {
             }
           });
         }
-        await sock.sendMessage(jid, { text: message.text, mentions });
+        await sock.sendMessage(jid, { text: message.text, edit: key, mentions });
         saveMessage(jid, "assistant", message.text);
         key = null;
       }
