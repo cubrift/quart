@@ -57,7 +57,8 @@ GIPHY_API_KEY=your_giphy_api_key_here
 ### Prerequisites
 - Node.js v20.0.0 or higher installed.
 - An active WhatsApp account to enter the pairing code.
-- An OPEN_API_KEY and a GIPHY_API_KEY both defined inside the environment variables or the `.env` file
+- An `OPEN_API_KEY` and a `GIPHY_API_KEY` all defined inside the environment variables or the `.env` file
+- A `PHONE_NUMBER` in the `.env` file
 
 ### Installation
 
@@ -75,7 +76,7 @@ npm install
 ```
 
 Configure environment variables:
-Create a .env file and fill in `OPEN_API_KEY` and `GIPHY_API_KEY`.
+Create a .env file and fill in `PHONE_NUMBER`, `OPEN_API_KEY` and `GIPHY_API_KEY`.
 
 #### Run Quart:
 
