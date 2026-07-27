@@ -43,6 +43,9 @@ Designed to feel like a real participant in group chats and direct messages, Qua
 Create a `.env` file in the root directory of your project and configure the required keys:
 
 ```env
+# Required for pairing code
+PHONENUMBER=your_phone_number_here
+
 # Required for OpenAI API model responses
 OPEN_API_KEY=your_openai_api_key_here
 
@@ -58,7 +61,7 @@ GIPHY_API_KEY=your_giphy_api_key_here
 - Node.js v20.0.0 or higher installed.
 - An active WhatsApp account to enter the pairing code.
 - An `OPEN_API_KEY` and a `GIPHY_API_KEY` all defined inside the environment variables or the `.env` file
-- A `PHONE_NUMBER` in the `.env` file
+- A `PHONE_NUMBER` in the `.env` file (without any symbols e.g. 445296151350)
 
 ### Installation
 
