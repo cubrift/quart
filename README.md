@@ -30,7 +30,7 @@ Designed to feel like a real participant in group chats and direct messages, Qua
 
 ## Tech Stack
 
-- **Runtime**: [Node.js](https://nodejs.org) (v24+)
+- **Runtime**: [Node.js](https://nodejs.org) (v20+)
 - **WhatsApp API**: [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
 - **AI / LLM Framework**: [Vercel AI SDK](https://vercel.com/ai-sdk/) / [OpenAI API](https://platform.openai.com)
 - **Database**: [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)
@@ -55,7 +55,7 @@ GIPHY_API_KEY=your_giphy_api_key_here
 ## Getting Started
 
 ### Prerequisites
-- Node.js v24.0.0 or higher installed.
+- Node.js v20.0.0 or higher installed.
 - An active WhatsApp account to enter the pairing code.
 - An OPEN_API_KEY and a GIPHY_API_KEY both defined inside the environment variables or the `.env` file
 
