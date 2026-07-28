@@ -29,15 +29,16 @@ It is built to join conversations naturally, keep track of what is going on, and
 
 # Features
 
-- Autonomous conversation awareness — can respond naturally when context suggests it is relevant.
-- Quoted reply support — understands replied-to messages so context is not lost.
-- GIF integration — searches and sends relevant GIFs using the Giphy API.
-- Poll generation — creates interactive WhatsApp polls based on chat context or user requests.
-- Location sharing — sends map pins and location data on demand.
-- Emoji reactions — reacts to messages based on sentiment and context.
-- SQLite memory — stores structured chat history locally with "better-sqlite3".
-- Tool-aware prompt flow — maps tool calls and conversation state cleanly into the model context.
-- Lean context handling — designed to stay efficient and cost-conscious.
+- Autonomous conversation awareness: can respond naturally when context suggests it is relevant.
+- Quoted reply support: understands replied-to messages so context is not lost.
+- GIF integration: searches and sends relevant GIFs using the Giphy API.
+- Poll generation: creates interactive WhatsApp polls based on chat context or user requests.
+- Location sharing: sends map pins and location data on demand.
+- Emoji reactions: reacts to messages based on sentiment and context.
+- Text formatting: can use text formatting in its messages
+- SQLite memory: stores structured chat history locally with "better-sqlite3".
+- Tool-aware prompt flow: maps tool calls and conversation state cleanly into the model context.
+- Lean context handling: designed to stay efficient and cost-conscious.
 
 ---
 
