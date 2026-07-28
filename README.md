@@ -15,7 +15,7 @@ Quart is designed to feel less like a command-driven bot and more like a real pa
 
 ---
 
-<img height="216" alt="QuartBanner" src="https://cdn.discordapp.com/attachments/926504363592151040/1531511261412593714/32b30190-20eb-43fd-b81b-a6ae5fa13d5f.jpg?ex=6a697a82&is=6a682902&hm=f427ea50f98be270b615cafedcdba6b2fbc3581037bce89b261249d9055ff418&" />
+<img width="auto" height="216" alt="QuartBanner" src="https://cdn.discordapp.com/attachments/926504363592151040/1531511261412593714/32b30190-20eb-43fd-b81b-a6ae5fa13d5f.jpg?ex=6a697a82&is=6a682902&hm=f427ea50f98be270b615cafedcdba6b2fbc3581037bce89b261249d9055ff418&" />
 
 # Why Quart?
 
