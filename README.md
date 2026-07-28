@@ -19,7 +19,7 @@ Quart is designed to feel less like a command-driven bot and more like a real pa
 
 Most WhatsApp bots only respond when directly prompted.
 
-Quart is different.
+**Quart is different.**
 
 It is built to join conversations naturally, keep track of what is going on, and behave like a genuine group member rather than a rigid automation script. The goal is to make AI communication feel lightweight, useful, and surprisingly human.
 
