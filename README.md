@@ -41,11 +41,11 @@ Features
 
 Tech Stack
 
-- Runtime: "Node.js" (https://nodejs.org) (v20+)
-- WhatsApp API: "@whiskeysockets/baileys" (https://github.com/WhiskeySockets/Baileys)
-- AI / LLM Framework: "Vercel AI SDK" (https://vercel.com/ai-sdk) / "OpenAI API" (https://platform.openai.com)
-- Database: "better-sqlite3" (https://www.npmjs.com/package/better-sqlite3)
-- GIF Provider: "Giphy API" (https://developers.giphy.com)
+- Runtime: [Node.js](https://nodejs.org) (v20+)
+- WhatsApp API: [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
+- AI / LLM Framework: [Vercel AI SDK](https://vercel.com/ai-sdk) / [OpenAI API](https://platform.openai.com)
+- Database: [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)
+- GIF Provider: [Giphy API](https://developers.giphy.com)
 
 ---
 
@@ -81,17 +81,23 @@ cd quart
 
 Install dependencies:
 
+```bash
 npm install
+```
 
 Create a ".env" file in the project root and add your environment variables:
 
-PHONE_NUMBER=445296151350
+```
+PHONE_NUMBER=your_phone_number_here
 OPEN_API_KEY=your_openai_api_key_here
 GIPHY_API_KEY=your_giphy_api_key_here
+```
 
 Start Quart:
 
+```bash
 node index.js
+```
 
 Then follow the terminal instructions to scan the generated WhatsApp QR code or use the pairing flow. Once authenticated, session credentials will be stored locally.
 
@@ -177,9 +183,11 @@ A typical deployment flow looks like this:
 
 Example:
 
+```bash
 npm install -g pm2
 pm2 start index.js --name quart-bot
 pm2 save
+```
 
 Make sure your host keeps the process alive and has persistent storage available for session data and SQLite files.
 
@@ -188,12 +196,6 @@ Make sure your host keeps the process alive and has persistent storage available
 Notes
 
 Quart is actively evolving, so the codebase may change quickly as features are added and the architecture improves. If something looks rough, that is usually a sign that there is room for a good contribution.
-
----
-
-License
-
-Add your chosen licence here.
 
 ---
 
