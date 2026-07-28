@@ -20,8 +20,7 @@ const {
   DisconnectReason,
   fetchLatestBaileysVersion,
   getAggregateVotesInPollMessage,
-  decryptPollVote,
-  Browsers
+  decryptPollVote
 } = require("baileys");
 
 const pino = require("pino");
@@ -31,7 +30,6 @@ const crypto = require('crypto');
 const { PHONE_NUMBER } = require("./Config");
 const { getRealLid } = require("./Util");
 const messageAI = require('./messages/ai/MessageAI');
-const { rm } = require('fs/promises');
 
 function getOptionHash(optionName) {
   return crypto
@@ -40,16 +38,23 @@ function getOptionHash(optionName) {
     .digest();
 }
 
+const MEAL_ENDPOINT = "https://themealdb.com/api/json/v1/1/";
+
 const polls = new Map();
 
+async function weather(latitude, longitude) {
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,uv_index_max,apparent_temperature_max,apparent_temperature_min&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,cloud_cover,surface_pressure,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto`);
+  return await res.json();
+}
+
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("./auth");
+  const { state, saveCreds } = await useMultiFileAuthState("./tmp");
 
   const sock = makeWASocket({
     auth: state,
     logger: pino({ level: "silent" }),
     printQRInTerminal: false,
-    syncFullHistory: false,
+    syncFullHistory: true,
     markOnlineOnConnect: false
   });
     
@@ -66,7 +71,7 @@ async function startBot() {
     }, 3000); // Small delay to let the socket establish connection first
   }
 
-  sock.ev.on("connection.update", async ({ connection, qr, lastDisconnect }) => {
+  sock.ev.on("connection.update", ({ connection, qr, lastDisconnect }) => {
     if (qr) {
       console.clear();
       console.log("Scan this QR:\n");
@@ -82,13 +87,9 @@ async function startBot() {
       const shouldReconnect =
         lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
 
-      console.log('Connection closed due to ', lastDisconnect?.error, ', reconnecting: ', shouldReconnect)
+      console.log("Disconnected");
 
       if (shouldReconnect) {
-        startBot();
-      }
-      else {
-        await rm("./auth", { recursive: true, force: true });
         startBot();
       }
     }
