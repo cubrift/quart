@@ -1,124 +1,197 @@
-<img height="216" alt="QuartBanner" src="https://github.com/user-attachments/assets/b83c173a-fd66-47eb-871e-3d0d77f2b860" />
+<img height="216" alt="Quart Banner" src="https://github.com/user-attachments/assets/b83c173a-fd66-47eb-871e-3d0d77f2b860" />""Build" (https://img.shields.io/badge/build-passing-brightgreen)"
+""GitHub Stars" (https://img.shields.io/github/stars/cubrift/quart?style=flat&color=gold)" (https://github.com/cubrift/quart/stargazers)
+""GitHub Repo" (https://img.shields.io/badge/github-repo-blue?logo=github)" (https://github.com/cubrift/quart)
+""WhatsApp" (https://img.shields.io/badge/Baileys-25D366?style=flat&logo=whatsapp&logoColor=white)" (https://github.com/WhiskeySockets/Baileys)
+""OpenAI" (https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white)" (https://platform.openai.com)
+""Vercel AI SDK" (https://img.shields.io/badge/Vercel%20AI%20SDK-000000?style=flat&logo=vercel&logoColor=white)" (https://vercel.com/ai-sdk)
 
-![](https://img.shields.io/badge/build-passing-brightgreen)
-![](https://img.shields.io/badge/github-repo-blue?logo=github)
-[![GitHub Stars](https://img.shields.io/github/stars/cubrift/quart?style=flat&color=gold)](https://github.com/cubrift/quart/stargazers)
-[![WhatsApp](https://img.shields.io/badge/Baileys-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
-[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openaigym)](https://platform.openai.com)
-[![Vercel](https://img.shields.io/badge/Vercel-991412?style=flat&logo=vercel)](https://vercel.com/ai-sdk)
+Quart
 
-# Quart
+Quart is an autonomous, context-aware AI chatbot for WhatsApp, built with Node.js, Baileys, and the Vercel AI SDK / OpenAI API.
 
-**Quart** is an autonomous, context-aware AI chatbot for WhatsApp built with **Node.js**, **Baileys**, and the **Vercel AI SDK / OpenAI API**.
-
-Designed to feel like a real participant in group chats and direct messages, Quart doesn't just reply when prompted! It supports multi-media interactions, understands quoted replies, tracks structured message history via SQLite, and can join conversations when it is mentioned when it "feels" like it.
+Quart is designed to feel less like a command-driven bot and more like a real participant in the conversation. It can follow ongoing group chat context, understand quoted replies, react naturally, send GIFs, create polls, share locations, and keep a structured memory of conversations using SQLite.
 
 ---
 
-## Features
+Why Quart?
 
-- **Autonomous & Spontaneous Engagement**: Responds naturally in conversations and occasionally comes in when relevant.
-- **GIF Integration**: Automatically searches and sends (somewhat) relevant GIFs powered by the Giphy API.
-- **Poll Generation**: Creates interactive WhatsApp polls based on chat context or requests.
-- **Map & Location Sharing**: Shares map pins and location data on demand.
-- **Message Reactions**: Reacts to user messages with emojis based on sentiment and context.
-- **Quoted Reply Context**: Remembers and understands quoted/replied messages so context is never lost.
-- **SQLite Chat History**: Efficient, local chat memory persistence with SQLite (`better-sqlite3`), mapping tool calls seamlessly for prompt tracking.
-- **Optimized Context Window**: Lightweight message handling structured to work efficiently with low-cost model configurations.
+Most WhatsApp bots only respond when directly prompted.
+
+Quart is different.
+
+It is built to join conversations naturally, keep track of what is going on, and behave like a genuine group member rather than a rigid automation script. The goal is to make AI communication feel lightweight, useful, and surprisingly human.
 
 ---
 
-## Tech Stack
+Features
 
-- **Runtime**: [Node.js](https://nodejs.org) (v20+)
-- **WhatsApp API**: [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
-- **AI / LLM Framework**: [Vercel AI SDK](https://vercel.com/ai-sdk/) / [OpenAI API](https://platform.openai.com)
-- **Database**: [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)
-- **GIF Provider**: [Giphy API](https://developers.giphy.com)
-
----
-
-## Environment Variables
-
-Create a `.env` file in the root directory of your project and configure the required keys:
-
-```env
-# Required for pairing code
-PHONE_NUMBER=your_phone_number_here
-
-# Required for OpenAI API model responses
-OPEN_API_KEY=your_openai_api_key_here
-
-# Required for fetching GIFs from Giphy
-GIPHY_API_KEY=your_giphy_api_key_here
-```
+- Autonomous conversation awareness — can respond naturally when context suggests it is relevant.
+- Quoted reply support — understands replied-to messages so context is not lost.
+- GIF integration — searches and sends relevant GIFs using the Giphy API.
+- Poll generation — creates interactive WhatsApp polls based on chat context or user requests.
+- Location sharing — sends map pins and location data on demand.
+- Emoji reactions — reacts to messages based on sentiment and context.
+- SQLite memory — stores structured chat history locally with "better-sqlite3".
+- Tool-aware prompt flow — maps tool calls and conversation state cleanly into the model context.
+- Lean context handling — designed to stay efficient and cost-conscious.
 
 ---
 
-## Getting Started
+Tech Stack
 
-### Prerequisites
-- Node.js v20.0.0 or higher installed.
-- An active WhatsApp account to enter the pairing code.
-- An `OPEN_API_KEY` and a `GIPHY_API_KEY` all defined inside the environment variables or the `.env` file
-- A `PHONE_NUMBER` in the `.env` file (without any symbols e.g. 445296151350)
+- Runtime: "Node.js" (https://nodejs.org) (v20+)
+- WhatsApp API: "@whiskeysockets/baileys" (https://github.com/WhiskeySockets/Baileys)
+- AI / LLM Framework: "Vercel AI SDK" (https://vercel.com/ai-sdk) / "OpenAI API" (https://platform.openai.com)
+- Database: "better-sqlite3" (https://www.npmjs.com/package/better-sqlite3)
+- GIF Provider: "Giphy API" (https://developers.giphy.com)
 
-### Installation
+---
 
-#### Clone the repository:
+Project Structure
 
-```bash
+quart/
+├── database/
+├── ai/
+├── tools/
+├── handlers/
+├── prompts/
+├── index.js
+└── .env
+
+---
+
+Quick Start
+
+Prerequisites
+
+- Node.js v20 or higher
+- A WhatsApp account for pairing
+- An OpenAI API key
+- A Giphy API key
+- A phone number entered in international format, without symbols
+
+Installation
+
+Clone the repository:
+
 gh repo clone cubrift/quart
 cd quart
-```
 
-#### Install dependencies:
+Install dependencies:
 
-```bash
 npm install
-```
 
-Configure environment variables:
-Create a .env file and fill in `PHONE_NUMBER`, `OPEN_API_KEY` and `GIPHY_API_KEY`.
+Create a ".env" file in the project root and add your environment variables:
 
-#### Run Quart:
+PHONE_NUMBER=445296151350
+OPEN_API_KEY=your_openai_api_key_here
+GIPHY_API_KEY=your_giphy_api_key_here
 
-```Bash
+Start Quart:
+
 node index.js
-```
 
-#### Authenticate:
-Follow the terminal instructions to scan the generated WhatsApp QR/pairing code with your phone. Once authenticated, session credentials will be stored locally.
+Then follow the terminal instructions to scan the generated WhatsApp QR code or use the pairing flow. Once authenticated, session credentials will be stored locally.
 
 ---
 
-## Deployment
-Quart is designed to be lightweight and server-friendly. You can run it continuously on any Linux VPS or free hosting platforms such as [Wispbyte](https://wispbyte.com):
-- Upload/clone the repository to your host server.
-- Set your environment variables in the host control panel or .env.
+Environment Variables
 
-Start the process using a process manager like PM2 to ensure automatic restarts:
-```bash
+Variable| Required| Purpose
+"PHONE_NUMBER"| Yes| The phone number used for WhatsApp pairing
+"OPEN_API_KEY"| Yes| Used for model responses
+"GIPHY_API_KEY"| Yes| Used for GIF search
+
+---
+
+Contributing
+
+Contributions of all sizes are welcome.
+
+If you are interested in AI prompts, Node.js, WhatsApp automation, code quality, architecture, or documentation, Quart would be a great project to jump into.
+
+Helpful contributions include:
+
+- bug fixes
+- refactors
+- documentation improvements
+- prompt engineering
+- feature ideas
+- tests
+- issue triage
+- performance improvements
+
+Good First Contributions
+
+A few especially useful places to help:
+
+- improve or simplify the system prompt
+- clean up message handling
+- split large modules into smaller, clearer pieces
+- improve SQLite schema design
+- add better logging and error handling
+- write setup docs or examples
+
+Before Opening a Pull Request
+
+Please try to:
+
+- keep changes focused
+- explain what the change does and why it helps
+- include screenshots or examples where useful
+- make sure the project still runs cleanly after your changes
+
+If you find something confusing, open an issue. Clear bugs and unclear docs are both welcome contributions.
+
+---
+
+Roadmap
+
+- [x] WhatsApp conversation awareness
+- [x] Quoted reply context
+- [x] GIF support
+- [x] Poll generation
+- [x] Location sharing
+- [x] Local SQLite history
+- [ ] Voice message support
+- [ ] Plugin system
+- [ ] Better long-term memory
+- [ ] Web dashboard
+- [ ] Cleaner modular architecture
+- [ ] More contributor-friendly tooling
+
+---
+
+Deployment
+
+Quart is lightweight enough to run on a small VPS or other always-on Linux host.
+
+A typical deployment flow looks like this:
+
+1. Upload or clone the repository to your server
+2. Configure the environment variables
+3. Install dependencies
+4. Run the bot with a process manager such as PM2
+
+Example:
+
 npm install -g pm2
-pm2 start index.js --name "quart-bot"
+pm2 start index.js --name quart-bot
 pm2 save
-```
+
+Make sure your host keeps the process alive and has persistent storage available for session data and SQLite files.
 
 ---
 
-## Contributing & Prompt Engineering
-Contributions are extremely welcome: especially around system instruction engineering!
+Notes
 
-### System Prompt Optimization
-The current challenge is balancing low token costs against strict instruction adherence:
-- Token Efficiency: We want system instructions that maximize OpenAI Prompt Caching benefits (reusing static prefix context across requests to trigger 50%+ discount on input tokens).
-- Instruction Quality: Ensuring Quart strictly obeys persona rules, tool triggering criteria, and output limits without bloating prompt length.
+Quart is actively evolving, so the codebase may change quickly as features are added and the architecture improves. If something looks rough, that is usually a sign that there is room for a good contribution.
 
-### Refactorization
-Any refactoring, whether that's cleaning up spaghetti code, would be greatly appreciated!
-Our code is always somewhat messy, so making everything *neat* and *modular* is the definitely the way to go for this project 😎.
+---
 
-If you have experience crafting concise, high-density system prompts or optimizing LLM context structures for prompt caching, please open a Pull Request or Issue!
+License
+
+Add your chosen licence here.
 
 ---
 
