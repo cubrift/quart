@@ -56,7 +56,7 @@ async function startBot() {
       const shouldReconnect =
         lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
 
-      console.log("Disconnected", lastDisconnect.error);
+      console.log("Disconnected");
 
       if (shouldReconnect) {
         startBot();
