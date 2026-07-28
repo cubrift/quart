@@ -90,15 +90,6 @@ Then follow the terminal instructions to scan the generated WhatsApp QR code or 
 
 ---
 
-## Environment Variables
-
-Variable| Required| Purpose
-"PHONE_NUMBER"| Yes| The phone number used for WhatsApp pairing
-"OPEN_API_KEY"| Yes| Used for model responses
-"GIPHY_API_KEY"| Yes| Used for GIF search
-
----
-
 # Contributing
 
 Contributions of all sizes are welcome.
