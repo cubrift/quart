@@ -15,7 +15,7 @@ Quart is designed to feel less like a command-driven bot and more like a real pa
 
 ---
 
-<img width="auto" height="216" alt="QuartBanner" src="https://imgcdn.dev/i/YHV7oq" />
+<img width="auto" height="216" alt="QuartBanner" src="https://s6.imgcdn.dev/YHV7oq.jpg" />
 
 # Why Quart?
 
