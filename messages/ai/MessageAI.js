@@ -1,11 +1,11 @@
 const { Poll } = require('../Poll');
-const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage } = require('../MessageDatabase');
+const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage, assistantMessage } = require('../MessageDatabase');
 const checkShouldRespond = require('./CheckShouldRespond');
 const { MODEL_NAME, EDIT_INTERVAL, CHECK_MODEL_NAME, MAX_MESSAGE_CONTEXT } = require("../../Config");
 const { getSystemInstructions } = require("./SystemInstructions");
 const schema = require("./schemas/AISchema");
 
-const { generateText, streamText, Output } = require("ai");
+const { generateText, streamText, Output, tool } = require("ai");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
 const { createOpenAI } = require('@ai-sdk/openai');
 const { getRealLid, extractImageData } = require('../../Util');
@@ -72,9 +72,10 @@ module.exports = async function messageAI(sock, msg, polls) {
   await sock.sendPresenceUpdate('composing', jid);
 
   let partialOutputStream = null;
+  let usage = null;
 
   try {
-    ({ partialOutputStream } = await streamText({
+    ({ partialOutputStream, usage } = await streamText({
       model: model(MODEL_NAME),
       output: Output.object({ schema }),
       abortSignal: controller.signal,
@@ -132,11 +133,12 @@ module.exports = async function messageAI(sock, msg, polls) {
           });
         }
         await sock.sendMessage(jid, { text: message.text, edit: key, mentions });
-        saveMessage(jid, "assistant", message.text);
+        assistantMessage(jid, message.text);
         key = null;
       }
       if (message.poll) {
-        const poll = new Poll(await sock.sendMessage(jid, { poll: message.poll }));
+        const m = { poll: message.poll };
+        const poll = new Poll(await sock.sendMessage(jid, m));
         poll.onVote = (vote, voteMsg) => {
           userMiscMessage(jid, voteMsg, "Voter", `voted for \"${vote}\" in Quart's poll \"${message.poll.name}\"`);
           messageAI(sock, jid, voteMsg, polls);
@@ -146,15 +148,17 @@ module.exports = async function messageAI(sock, msg, polls) {
           messageAI(sock, jid, voteMsg, polls);
         }
         polls.set(poll.msg.key.id, poll);
-        assistantMiscMessage(jid, JSON.stringify(message));
+        assistantMiscMessage(jid, JSON.stringify(m));
       }
       if (message.location) {
-        await sock.sendMessage(jid, { location: message.location });
-        assistantMiscMessage(jid, JSON.stringify(message));
+        const m = { location: message.location };
+        await sock.sendMessage(jid, m);
+        assistantMiscMessage(jid, JSON.stringify(m));
       }
       if (message.reaction) {
-        await sock.sendMessage(jid, { react: { text: message.reaction, key: msg.key } });
-        assistantMiscMessage(jid, JSON.stringify(message));
+        const m = { react: { text: message.reaction, key: msg.key } };
+        await sock.sendMessage(jid, m);
+        assistantMiscMessage(jid, JSON.stringify({ react: { text: m.react.text } }));
       }
       if (message.gif) {
         await sock.sendPresenceUpdate('composing', jid);
@@ -180,11 +184,11 @@ module.exports = async function messageAI(sock, msg, polls) {
           const selectorSystemPrompt = `You are Quart's GIF selector module.
 Quart wants to respond to the group chat with a GIF based on the search query: "${message.gif.searchQuery}".
 
-Here are the candidate GIFs returned from the search:
-${formattedCandidates.join("\n")}
-
 Your task:
-Analyze the recent group chat conversation and select the ONE GIF option (by index number) which title best fits the humor, mood, or joke of the situation.`;
+Analyze the recent group chat conversation and select the ONE GIF option (by index number) which title best fits the humor, mood, or joke of the situation.
+
+Here are the candidate GIFs returned from the search:
+${formattedCandidates.join("\n")}`;
 
           await sock.sendPresenceUpdate('composing', jid);
           const { _output } = await generateText({
@@ -233,4 +237,6 @@ Analyze the recent group chat conversation and select the ONE GIF option (by ind
   }
 
   await sock.sendPresenceUpdate('paused', jid);
+
+  console.log(await usage);
 }

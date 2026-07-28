@@ -1,17 +1,3 @@
-// const express = require('express');
-// const app = express();
-// const PORT = process.env.PORT || 13430;
-
-// const { Poll } = require('./messages/Poll');
-
-// app.get('/', (req, res) => {
-//   res.send('Bot is active and running 24/7!');
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`Ping server listening on port ${PORT}`);
-// });
-
 require('dotenv').config({ quiet: true }); 
 
 const {
@@ -20,16 +6,18 @@ const {
   DisconnectReason,
   fetchLatestBaileysVersion,
   getAggregateVotesInPollMessage,
-  decryptPollVote
+  decryptPollVote,
+  Browsers
 } = require("baileys");
 
 const pino = require("pino");
 const qrcode = require("qrcode-terminal");
 
+const messageAI = require('./messages/ai/MessageAI');
+
 const crypto = require('crypto');
 const { PHONE_NUMBER } = require("./Config");
 const { getRealLid } = require("./Util");
-const messageAI = require('./messages/ai/MessageAI');
 
 function getOptionHash(optionName) {
   return crypto
@@ -38,38 +26,15 @@ function getOptionHash(optionName) {
     .digest();
 }
 
-const MEAL_ENDPOINT = "https://themealdb.com/api/json/v1/1/";
-
 const polls = new Map();
-
-async function weather(latitude, longitude) {
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,uv_index_max,apparent_temperature_max,apparent_temperature_min&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,cloud_cover,surface_pressure,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto`);
-  return await res.json();
-}
 
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./tmp");
-
   const sock = makeWASocket({
     auth: state,
-    logger: pino({ level: "silent" }),
-    printQRInTerminal: false,
-    syncFullHistory: true,
-    markOnlineOnConnect: false
+    logger: pino({ level: "error" }),
+    browser: [ 'Quart', 'Desktop', '1.0' ]
   });
-    
-  if (!sock.authState.creds.registered) {
-    setTimeout(async () => {
-      try {
-        const code = await sock.requestPairingCode(process.env.PHONE_NUMBER);
-        console.log('\n====================================');
-        console.log(`ENTER THIS PAIRING CODE ON YOUR PHONE: ${code}`);
-        console.log('====================================\n');
-      } catch (err) {
-        console.error('Failed to generate pairing code:', err);
-      }
-    }, 3000); // Small delay to let the socket establish connection first
-  }
 
   sock.ev.on("connection.update", ({ connection, qr, lastDisconnect }) => {
     if (qr) {
