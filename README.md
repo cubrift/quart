@@ -1,4 +1,4 @@
-<img alt="Quart Texts" src="https://s6.imgcdn.dev/YHV7oq.jpg" />
+<img alt="image (2)" src="https://github.com/user-attachments/assets/29cbe0e1-5584-42ff-a199-8f98c47ece1e" />
 
 ![](https://img.shields.io/badge/build-passing-brightgreen)
 ![](https://img.shields.io/badge/github-repo-blue?logo=github)
