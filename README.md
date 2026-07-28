@@ -23,6 +23,8 @@ Most WhatsApp bots only respond when directly prompted.
 
 It is built to join conversations naturally, keep track of what is going on, and behave like a genuine group member rather than a rigid automation script. The goal is to make AI communication feel lightweight, useful, and surprisingly human.
 
+<img width="480" alt="ezgif-1291b92c47407816" src="https://github.com/user-attachments/assets/31905083-2c37-4c07-a9f2-ad0be18b5b79" />
+
 ---
 
 # Features
