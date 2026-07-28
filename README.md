@@ -44,11 +44,11 @@ It is built to join conversations naturally, keep track of what is going on, and
 
 # Tech Stack
 
-- Runtime: [Node.js](https://nodejs.org) (v20+)
-- WhatsApp API: [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
-- AI / LLM Framework: [Vercel AI SDK](https://vercel.com/ai-sdk) / [OpenAI API](https://platform.openai.com)
-- Database: [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)
-- GIF Provider: [Giphy API](https://developers.giphy.com)
+- **Runtime:** [Node.js](https://nodejs.org) (v20+)
+- **WhatsApp API:** [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
+- **AI / LLM Framework:** [Vercel AI SDK](https://vercel.com/ai-sdk) / [OpenAI API](https://platform.openai.com)
+- **Database:** [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)
+- **GIF Provider:** [Giphy API](https://developers.giphy.com)
 
 ---
 
