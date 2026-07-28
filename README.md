@@ -7,7 +7,7 @@
 [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openaigym)](https://platform.openai.com)
 [![Vercel](https://img.shields.io/badge/Vercel-991412?style=flat&logo=vercel)](https://vercel.com/ai-sdk)
 
-Quart
+# Quart
 
 Quart is an autonomous, context-aware AI chatbot for WhatsApp, built with Node.js, Baileys, and the Vercel AI SDK / OpenAI API.
 
@@ -15,7 +15,7 @@ Quart is designed to feel less like a command-driven bot and more like a real pa
 
 ---
 
-Why Quart?
+# Why Quart?
 
 Most WhatsApp bots only respond when directly prompted.
 
@@ -25,7 +25,7 @@ It is built to join conversations naturally, keep track of what is going on, and
 
 ---
 
-Features
+# Features
 
 - Autonomous conversation awareness — can respond naturally when context suggests it is relevant.
 - Quoted reply support — understands replied-to messages so context is not lost.
@@ -39,7 +39,7 @@ Features
 
 ---
 
-Tech Stack
+# Tech Stack
 
 - Runtime: [Node.js](https://nodejs.org) (v20+)
 - WhatsApp API: [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
@@ -49,22 +49,9 @@ Tech Stack
 
 ---
 
-Project Structure
+# Quick Start
 
-quart/
-├── database/
-├── ai/
-├── tools/
-├── handlers/
-├── prompts/
-├── index.js
-└── .env
-
----
-
-Quick Start
-
-Prerequisites
+## Prerequisites
 
 - Node.js v20 or higher
 - A WhatsApp account for pairing
@@ -72,20 +59,20 @@ Prerequisites
 - A Giphy API key
 - A phone number entered in international format, without symbols
 
-Installation
+## Installation
 
-Clone the repository:
+### Clone the repository:
 
 gh repo clone cubrift/quart
 cd quart
 
-Install dependencies:
+### Install dependencies:
 
 ```bash
 npm install
 ```
 
-Create a ".env" file in the project root and add your environment variables:
+### Create a ".env" file in the project root and add your environment variables:
 
 ```
 PHONE_NUMBER=your_phone_number_here
@@ -93,7 +80,7 @@ OPEN_API_KEY=your_openai_api_key_here
 GIPHY_API_KEY=your_giphy_api_key_here
 ```
 
-Start Quart:
+### Start Quart:
 
 ```bash
 node index.js
@@ -103,7 +90,7 @@ Then follow the terminal instructions to scan the generated WhatsApp QR code or 
 
 ---
 
-Environment Variables
+## Environment Variables
 
 Variable| Required| Purpose
 "PHONE_NUMBER"| Yes| The phone number used for WhatsApp pairing
@@ -112,7 +99,7 @@ Variable| Required| Purpose
 
 ---
 
-Contributing
+# Contributing
 
 Contributions of all sizes are welcome.
 
@@ -129,7 +116,7 @@ Helpful contributions include:
 - issue triage
 - performance improvements
 
-Good First Contributions
+## Good First Contributions
 
 A few especially useful places to help:
 
@@ -140,7 +127,7 @@ A few especially useful places to help:
 - add better logging and error handling
 - write setup docs or examples
 
-Before Opening a Pull Request
+## Before Opening a Pull Request
 
 Please try to:
 
@@ -153,7 +140,7 @@ If you find something confusing, open an issue. Clear bugs and unclear docs are 
 
 ---
 
-Roadmap
+# Roadmap
 
 - [x] WhatsApp conversation awareness
 - [x] Quoted reply context
@@ -170,9 +157,9 @@ Roadmap
 
 ---
 
-Deployment
+# Deployment
 
-Quart is lightweight enough to run on a small VPS or other always-on Linux host.
+Quart is lightweight enough to run on a small VPS or other always-on Linux host such as (Wispbyte)[https://wispbyte.com/].
 
 A typical deployment flow looks like this:
 
@@ -193,7 +180,7 @@ Make sure your host keeps the process alive and has persistent storage available
 
 ---
 
-Notes
+# Notes
 
 Quart is actively evolving, so the codebase may change quickly as features are added and the architecture improves. If something looks rough, that is usually a sign that there is room for a good contribution.
 
