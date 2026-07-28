@@ -7,7 +7,8 @@ const {
   fetchLatestBaileysVersion,
   getAggregateVotesInPollMessage,
   decryptPollVote,
-  Browsers
+  Browsers,
+  fetchLatestWaWebVersion
 } = require("baileys");
 
 const pino = require("pino");
@@ -29,8 +30,11 @@ function getOptionHash(optionName) {
 const polls = new Map();
 
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("./tmp");
+  const { state, saveCreds } = await useMultiFileAuthState("./auth");
+  const { version, error } = await fetchLatestWaWebVersion({});
+
   const sock = makeWASocket({
+    version,
     auth: state,
     logger: pino({ level: "error" }),
     browser: [ 'Quart', 'Desktop', '1.0' ]
@@ -52,7 +56,7 @@ async function startBot() {
       const shouldReconnect =
         lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
 
-      console.log("Disconnected");
+      console.log("Disconnected", lastDisconnect.error);
 
       if (shouldReconnect) {
         startBot();
