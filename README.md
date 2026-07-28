@@ -1,9 +1,11 @@
-<img height="216" alt="Quart Banner" src="https://github.com/user-attachments/assets/b83c173a-fd66-47eb-871e-3d0d77f2b860" />""Build" (https://img.shields.io/badge/build-passing-brightgreen)"
-""GitHub Stars" (https://img.shields.io/github/stars/cubrift/quart?style=flat&color=gold)" (https://github.com/cubrift/quart/stargazers)
-""GitHub Repo" (https://img.shields.io/badge/github-repo-blue?logo=github)" (https://github.com/cubrift/quart)
-""WhatsApp" (https://img.shields.io/badge/Baileys-25D366?style=flat&logo=whatsapp&logoColor=white)" (https://github.com/WhiskeySockets/Baileys)
-""OpenAI" (https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white)" (https://platform.openai.com)
-""Vercel AI SDK" (https://img.shields.io/badge/Vercel%20AI%20SDK-000000?style=flat&logo=vercel&logoColor=white)" (https://vercel.com/ai-sdk)
+<img height="216" alt="QuartBanner" src="https://github.com/user-attachments/assets/b83c173a-fd66-47eb-871e-3d0d77f2b860" />
+
+![](https://img.shields.io/badge/build-passing-brightgreen)
+![](https://img.shields.io/badge/github-repo-blue?logo=github)
+[![GitHub Stars](https://img.shields.io/github/stars/cubrift/quart?style=flat&color=gold)](https://github.com/cubrift/quart/stargazers)
+[![WhatsApp](https://img.shields.io/badge/Baileys-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openaigym)](https://platform.openai.com)
+[![Vercel](https://img.shields.io/badge/Vercel-991412?style=flat&logo=vercel)](https://vercel.com/ai-sdk)
 
 Quart
 
