@@ -84,9 +84,9 @@ OPEN_API_KEY=your_openai_api_key_here
 GIPHY_API_KEY=your_giphy_api_key_here
 ```
 
->Important
->Your phone number must be entered in international format without symbols.
->For example, given the country code is +44 the number must be only digits: +44275159...
+> [!IMPORTANT]
+> Your phone number must be entered in international format without symbols.
+> For example, given the country code is +44 the number must be only digits: +44275159...
 
 ### Start Quart:
 
