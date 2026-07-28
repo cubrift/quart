@@ -57,10 +57,9 @@ It is built to join conversations naturally, keep track of what is going on, and
 ## Prerequisites
 
 - Node.js v20 or higher
-- A WhatsApp account for pairing
+- A WhatsApp account with a phone number for pairing
 - An OpenAI API key
 - A Giphy API key
-- A phone number entered in international format, without symbols
 
 ## Installation
 
@@ -84,6 +83,10 @@ PHONE_NUMBER=your_phone_number_here
 OPEN_API_KEY=your_openai_api_key_here
 GIPHY_API_KEY=your_giphy_api_key_here
 ```
+
+>Important
+>Your phone number must be entered in international format without symbols.
+>For example, given the country code is +44 the number must be only digits: +44275159...
 
 ### Start Quart:
 
