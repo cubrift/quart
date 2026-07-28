@@ -31,6 +31,7 @@ const messageRequest = require('./messages/Messages');
 const crypto = require('crypto');
 const { PHONE_NUMBER } = require("./Config");
 const { getRealLid } = require("./Util");
+const messageAI = require('./messages/ai/MessageAI');
 
 function getOptionHash(optionName) {
   return crypto
@@ -147,7 +148,7 @@ async function startBot() {
           }
           continue;
         }
-        messageRequest(sock, msg, polls);
+        messageAI(sock, msg, polls);
       }
     } catch (error) {
       console.error("GETGJTEOGJETOHGETJHOTEJJEH", error);

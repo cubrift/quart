@@ -5,3 +5,4 @@ chat_history*
 package-lock.json
 old.js
 .env
+_!*
