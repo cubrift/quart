@@ -1,4 +1,4 @@
-<img height="216" alt="QuartBanner" src="https://github.com/user-attachments/assets/b83c173a-fd66-47eb-871e-3d0d77f2b860" />
+<img alt="Quart Texts" src="https://s6.imgcdn.dev/YHV7oq.jpg" />
 
 ![](https://img.shields.io/badge/build-passing-brightgreen)
 ![](https://img.shields.io/badge/github-repo-blue?logo=github)
@@ -14,8 +14,6 @@ Quart is an autonomous, context-aware AI chatbot for WhatsApp, built with Node.j
 Quart is designed to feel less like a command-driven bot and more like a real participant in the conversation. It can follow ongoing group chat context, understand quoted replies, react naturally, send GIFs, create polls, share locations, and keep a structured memory of conversations using SQLite.
 
 ---
-
-<img alt="Quart Texts" src="https://s6.imgcdn.dev/YHV7oq.jpg" />
 
 # Why Quart?
 
