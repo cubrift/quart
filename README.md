@@ -1,4 +1,4 @@
-<img alt="Quart Animation" src="https://github.com/user-attachments/assets/ed7ce180-6c68-4b1c-8a62-fe1c53af206c" />
+<img width="2000" height="1000" alt="Main Composition" src="https://github.com/user-attachments/assets/94c33748-40b9-49e8-98b8-8c4e7c60669b" />
 
 ![](https://img.shields.io/badge/build-passing-brightgreen)
 ![](https://img.shields.io/badge/github-repo-blue?logo=github)
