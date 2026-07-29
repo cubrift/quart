@@ -69,7 +69,7 @@ function updateQRHost(qrData) {
     }
 
     fetchQr();
-    setInterval(fetchQr, 60000);
+    setInterval(fetchQr, 1000);
   </script>
 </html>`);
       } catch (err) {
