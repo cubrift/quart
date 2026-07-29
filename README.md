@@ -92,7 +92,12 @@ npm link
 quart
 ```
 
-Then follow the terminal instructions to scan the generated WhatsApp QR code or use the pairing flow. Once authenticated, session credentials will be stored locally.
+### For more commands, run:
+```bash
+quart -h
+```
+
+Then follow the terminal instructions to scan the generated WhatsApp QR code. Once authenticated, session credentials will be stored locally.
 
 ---
 
