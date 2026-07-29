@@ -36,7 +36,7 @@ program
 
 program
   .option('-v, --verbose', 'enable verbose output')
-  .option('-t, --terminal', 'displays the QR in the terminal');
+  .option('-t, --terminal', 'display the QR in the terminal');
 
 program.parse(process.argv);
 const options = program.opts();
