@@ -28,6 +28,7 @@ It is built to join conversations naturally, keep track of what is going on, and
 # Features
 
 - **Autonomous conversation awareness:** can respond naturally when context suggests it is relevant.
+- **Talk to it:** can respond with voice messages using GPT-TTS models.
 - **Quoted reply support:** understands replied-to messages so context is not lost.
 - **Text formatting:** can use text formatting in its messages
 - **GIF integration:** searches and sends relevant GIFs using the Giphy API.
@@ -146,7 +147,7 @@ If you find something confusing, open an issue. Clear bugs and unclear docs are 
 - [x] Poll generation
 - [x] Location sharing
 - [x] Local SQLite history
-- [ ] Voice message support
+- [x] Voice message support
 - [ ] Plugin system
 - [ ] Better long-term memory
 - [ ] Web dashboard
