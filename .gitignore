@@ -2,7 +2,6 @@ node_modules
 auth
 tmp
 chat_history*
-package-lock.json
 old.js
 .env
 _!*
