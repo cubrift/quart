@@ -1,4 +1,4 @@
-<img alt="image (2)" src="https://github.com/user-attachments/assets/29cbe0e1-5584-42ff-a199-8f98c47ece1e" />
+<img alt="Quart Animation" src="https://github.com/user-attachments/assets/ed7ce180-6c68-4b1c-8a62-fe1c53af206c" />
 
 ![](https://img.shields.io/badge/build-passing-brightgreen)
 ![](https://img.shields.io/badge/github-repo-blue?logo=github)
@@ -22,10 +22,6 @@ Most WhatsApp bots only respond when directly prompted.
 **Quart is different.**
 
 It is built to join conversations naturally, keep track of what is going on, and behave like a genuine group member rather than a rigid automation script. The goal is to make AI communication feel lightweight, useful, and surprisingly human.
-
----
-
-<img width="500" alt="ezgif-1291b92c47407816" src="https://github.com/user-attachments/assets/31905083-2c37-4c07-a9f2-ad0be18b5b79" />
 
 ---
 
