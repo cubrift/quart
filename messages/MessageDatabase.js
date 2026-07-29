@@ -21,6 +21,8 @@ function saveMessage(jid, role, content) {
     'INSERT INTO messages (jid, role, content, timestamp) VALUES (?, ?, ?, ?)'
   );
   stmt.run(jid, role, content, Date.now());
+
+  return content;
 }
 
 // Get last N messages for AI context
@@ -49,7 +51,8 @@ function userMessage(jid, msg, content) {
 }
 
 function userMiscMessage(jid, msg, prefix, suffix) {
-  return saveMessage(jid, "user", `[${new Date().toISOString()}] ${prefix} ${msg?.pushName} ${jid?.endsWith('@g.us') ? `(mention ID: @${msg?.key?.participant?.split("@")?.[0]})` : ""} ${suffix}`);
+  const message = `[${new Date().toISOString()}] ${prefix} ${msg?.pushName} ${jid?.endsWith('@g.us') ? `(mention ID: @${msg?.key?.participant?.split("@")?.[0]})` : ""} ${suffix}`;
+  return saveMessage(jid, "user", message);
 }
 
 async function imageMessage(jid, msg) {

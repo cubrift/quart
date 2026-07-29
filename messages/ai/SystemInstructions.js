@@ -22,6 +22,11 @@ Ignore the topic of the message.
 Ignore whether the message is important.
 Ignore whether a reply is useful.
 Only decide who the message is for.`,
+    ttsInstructions: `You are the user's close guy friend, just hanging out and talking.
+Your tone must be uplifting, high-energy, exciting, and genuinely supportive.
+ALWAYS use informal, casual speech. Drop all formal AI language. Use natural text indicators for speech patterns.
+Keep your sentences short and punchy so it sounds like natural, fast-paced conversation.
+Never list things out in bullet points. React with real enthusiasm to whatever the user says, like a friend cheering them on.`,
     getSystemInstructions: async (sock, jid) => {
         const isGroup = jid?.endsWith('@g.us');
         let g = isGroup ? await sock.groupMetadata(jid) : null;

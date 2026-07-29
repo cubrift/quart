@@ -1,14 +1,19 @@
 const { Poll } = require('../Poll');
 const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage, assistantMessage } = require('../MessageDatabase');
 const checkShouldRespond = require('./CheckShouldRespond');
-const { MODEL_NAME, EDIT_INTERVAL, CHECK_MODEL_NAME, MAX_MESSAGE_CONTEXT } = require("../../Config");
-const { getSystemInstructions } = require("./SystemInstructions");
+const { MODEL_NAME, EDIT_INTERVAL, CHECK_MODEL_NAME, MAX_MESSAGE_CONTEXT, TTS_MODEL_NAME, TRANSCRIPTION_MODEL_NAME } = require("../../Config");
+const { getSystemInstructions, ttsInstructions } = require("./SystemInstructions");
 const schema = require("./schemas/AISchema");
 
 const { generateText, streamText, Output, tool } = require("ai");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
-const { createOpenAI, openai } = require('@ai-sdk/openai');
+const { createOpenAI, openai: oai } = require('@ai-sdk/openai');
 const { getRealLid, extractImageData } = require('../../Util');
+const { downloadMediaMessage } = require('baileys');
+
+const { default: OpenAI } = require('openai');
+const openai = new OpenAI();
+
 const model = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -21,7 +26,7 @@ module.exports = async function messageAI(sock, msg, polls) {
   const isGroup = jid?.endsWith('@g.us');
   
   const msgText = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || "";
-  if ((!msgText && !msg.message?.imageMessage) || msg.message?.reactionMessage || isStatus) return;
+  if ((!msgText && !msg.message?.imageMessage && !msg.message?.audioMessage) || msg.message?.reactionMessage || isStatus) return;
 
   const system = await getSystemInstructions(sock, jid);
 
@@ -56,14 +61,72 @@ module.exports = async function messageAI(sock, msg, polls) {
   const controller = new AbortController();
   activeGenerations.set(jid, controller);
 
+  let transcript = null;
+
+  if (msg.message.audioMessage) {
+    const { text } = await openai.audio.transcriptions.create({
+      file: await OpenAI.toFile(await downloadMediaMessage(msg, "buffer"), "input.ogg"),
+      model: TRANSCRIPTION_MODEL_NAME,
+    }, { signal: controller.signal });
+    transcript = text;
+    messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
+    console.log(text);
+    if (!text) return;
+  }
+
   if (isGroup
       && !msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(getRealLid(sock.user.lid))
-      && !msgText.toLowerCase().includes("quart")
       && !msg.message?.extendedTextMessage?.contextInfo?.nonJidMentions
+      && !msgText?.toLowerCase?.()?.includes?.("quart")
+      && !transcript?.toLowerCase?.()?.includes?.("qu")
       && !await checkShouldRespond(model, messages, controller)) {
     if (activeGenerations.get(jid) === controller)
       activeGenerations.delete(jid);
     return console.log("Ignoring");
+  }
+
+  if (msg.message.audioMessage) {
+    await sock.sendPresenceUpdate('composing', jid);
+    const { _output } = await generateText({
+      model: model(MODEL_NAME),
+      abortSignal: controller.signal,
+      tools: {
+        web_search: oai.tools.webSearch()
+      },
+      onError: (err) => {
+        if (controller.signal.aborted) return; // Ignore abort errors completely
+        console.error("Stream internal error:", err);
+      },
+      system,
+      messages
+    });
+
+    console.log(_output);
+
+    await sock.sendPresenceUpdate('recording', jid);
+
+    const res = await openai.audio.speech.create({
+      model: TTS_MODEL_NAME,
+      voice: "cedar",
+      input: _output,
+      instructions: "Speak in a cheerful and positive tone.",
+      response_format: "opus"
+    });
+
+    if (res.ok) {
+      const audioBuffer = Buffer.from(await res.arrayBuffer(), 'base64');
+      assistantMiscMessage(jid, _output);
+
+      await sock.sendMessage(jid, {
+        audio: audioBuffer,
+        mimetype: 'audio/ogg; codecs=opus',
+        ptt: true
+      });
+    } else {
+      console.error("No audio data returned from the model.");
+    }
+    await sock.sendPresenceUpdate('paused', jid);
+    return;
   }
 
   //console.log("Responding");
@@ -79,7 +142,7 @@ module.exports = async function messageAI(sock, msg, polls) {
       output: Output.object({ schema }),
       abortSignal: controller.signal,
       tools: {
-        web_search: openai.tools.webSearch()
+        web_search: oai.tools.webSearch()
       },
       onError: (err) => {
         if (controller.signal.aborted) return; // Ignore abort errors completely
