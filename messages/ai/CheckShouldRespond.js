@@ -20,6 +20,6 @@ module.exports = async function checkShouldRespond(model, messages, abortControl
   } catch (error) {
     console.error(error);
     if (abortController.signal.aborted) return false;
-    return checkShouldRespond();
+    return checkShouldRespond(model, messages, abortController);
   }
 }

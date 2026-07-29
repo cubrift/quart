@@ -81,6 +81,10 @@ module.exports = async function messageAI(sock, msg, polls) {
       tools: {
         web_search: openai.tools.webSearch()
       },
+      onError: (err) => {
+        if (controller.signal.aborted) return; // Ignore abort errors completely
+        console.error("Stream internal error:", err);
+      },
       system,
       messages
     }));

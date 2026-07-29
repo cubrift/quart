@@ -2,6 +2,21 @@
 
 require('dotenv').config({ quiet: true }); 
 
+// Catches unhandled promise rejections (like background stream aborts)
+process.on('unhandledRejection', (reason, promise) => {
+  const isAbort = 
+    reason?.name === 'AbortError' || 
+    reason?.message?.includes('aborted') || 
+    reason?.code === 'ABORT_ERR';
+
+  if (isAbort) {
+    console.log('[INFO] Async task was cancelled via AbortSignal.');
+    return; 
+  }
+
+  console.error('[UNHANDLED REJECTION]', reason);
+});
+
 const { program } = require('commander');
 const prompt = require('prompt-sync')();
 
