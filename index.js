@@ -31,7 +31,7 @@ const { rm } = require('fs/promises');
 
 program
   .name('quart')
-  .description('A custom CLI tool built with Node.js')
+  .description('An AI chatbot built for WhatsApp hosted using Baileys.')
   .version(version);
 
 program
