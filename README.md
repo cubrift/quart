@@ -155,7 +155,7 @@ If you find something confusing, open an issue. Clear bugs and unclear docs are 
 
 # Deployment
 
-Quart is lightweight enough to run on a small VPS or other always-on Linux host such as (Wispbyte)[https://wispbyte.com/].
+Quart is lightweight enough to run on a small VPS or other always-on Linux host such as [Wispbyte](https://wispbyte.com/).
 
 A typical deployment flow looks like this:
 
