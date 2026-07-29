@@ -88,7 +88,8 @@ GIPHY_API_KEY=your_giphy_api_key_here
 ### Start Quart:
 
 ```bash
-node index.js
+npm link
+quart
 ```
 
 Then follow the terminal instructions to scan the generated WhatsApp QR code or use the pairing flow. Once authenticated, session credentials will be stored locally.

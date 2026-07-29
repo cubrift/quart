@@ -1,23 +1,27 @@
 {
   "name": "quart",
-  "version": "1.0.0",
+  "version": "1.2.10",
   "description": "Quart is a conversational AI chatbot for WhatsApp",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "quart": "./index.js"
   },
   "keywords": [],
   "author": "cubrift.io",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@ai-sdk/openai": "latest",
-    "ai": "latest",
-    "baileys": "latest",
-    "better-sqlite3": "latest",
-    "country-emoji": "latest",
-    "dotenv": "latest",
+    "@ai-sdk/openai": "^4.0.23",
+    "ai": "^7.0.41",
+    "baileys": "^7.0.0-rc12",
+    "better-sqlite3": "^13.0.2",
+    "commander": "^15.0.0",
+    "country-emoji": "^2.0.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "pino": "^10.3.1",
+    "prompt-sync": "^4.2.0",
+    "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0"
   }
 }

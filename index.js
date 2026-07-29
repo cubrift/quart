@@ -1,4 +1,11 @@
+#!/usr/bin/env node
+
 require('dotenv').config({ quiet: true }); 
+
+const { program } = require('commander');
+const prompt = require('prompt-sync')();
+
+const { version } = require('./package.json');
 
 const {
   default: makeWASocket,
@@ -19,6 +26,20 @@ const messageAI = require('./messages/ai/MessageAI');
 const crypto = require('crypto');
 const { PHONE_NUMBER } = require("./Config");
 const { getRealLid } = require("./Util");
+const { updateQRHost, stopQRHost } = require('./QRHost');
+const { rm } = require('fs/promises');
+
+program
+  .name('quart')
+  .description('A custom CLI tool built with Node.js')
+  .version(version);
+
+program
+  .option('-v, --verbose', 'enable verbose output')
+  .option('-t, --terminal', 'displays the QR in the terminal');
+
+program.parse(process.argv);
+const options = program.opts();
 
 function getOptionHash(optionName) {
   return crypto
@@ -36,18 +57,22 @@ async function startBot() {
   const sock = makeWASocket({
     version,
     auth: state,
-    logger: pino({ level: "error" }),
+    logger: pino(options.verbose ? {} : { level: "silent" }),
     browser: [ 'Quart', 'Desktop', '1.0' ]
   });
 
-  sock.ev.on("connection.update", ({ connection, qr, lastDisconnect }) => {
+  sock.ev.on("connection.update", async ({ connection, qr, lastDisconnect }) => {
     if (qr) {
       console.clear();
-      console.log("Scan this QR:\n");
-      qrcode.generate(qr, { small: true });
+      console.log("QR Updated");
+      if (options.terminal)
+        qrcode.generate(qr, { small: true });
+      else
+        updateQRHost(qr);
     }
 
     if (connection === "open") {
+      stopQRHost();
       console.log("√ Connected!");
       console.log(sock.user?.lid);
     }
@@ -60,6 +85,15 @@ async function startBot() {
 
       if (shouldReconnect) {
         startBot();
+      }
+      else {
+        console.log("Logged out")
+        if (prompt("Delete /auth/* and reconnect? (y/n) ").trim() === "y")
+        {
+          await rm("./auth", { recursive: true });
+          console.log("Deleted /auth/*");
+          startBot();
+        }
       }
     }
   });

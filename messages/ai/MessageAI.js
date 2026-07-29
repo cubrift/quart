@@ -32,7 +32,6 @@ module.exports = async function messageAI(sock, msg, polls) {
   }
 
   const quote = msg.message?.extendedTextMessage?.contextInfo;
-  console.log(quote);
   if (quote) {
     userMiscMessage(jid, msg, "User", `quoted the following message from the user with mention ID ${quote.participant}: ${quote.quotedMessage?.conversation || quote.quotedMessage?.extendedTextMessage?.text || ""}`)
     
@@ -58,10 +57,10 @@ module.exports = async function messageAI(sock, msg, polls) {
   activeGenerations.set(jid, controller);
 
   if (isGroup
-       && !msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(getRealLid(sock.user.lid))
-       && !msgText.toLowerCase().includes("quart")
-       && !msg.message?.extendedTextMessage?.contextInfo?.nonJidMentions
-       && !await checkShouldRespond(model, messages, controller)) {
+      && !msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(getRealLid(sock.user.lid))
+      && !msgText.toLowerCase().includes("quart")
+      && !msg.message?.extendedTextMessage?.contextInfo?.nonJidMentions
+      && !await checkShouldRespond(model, messages, controller)) {
     if (activeGenerations.get(jid) === controller)
       activeGenerations.delete(jid);
     return console.log("Ignoring");
