@@ -78,7 +78,6 @@ module.exports = async function messageAI(sock, msg, polls) {
       && !transcript
       && !msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(getRealLid(sock.user.lid))
       && !msg.message?.extendedTextMessage?.contextInfo?.nonJidMentions
-      && !msgText?.toLowerCase?.()?.includes?.("quart")
       && !await checkShouldRespond(model, messages, controller)) {
     if (activeGenerations.get(jid) === controller)
       activeGenerations.delete(jid);
