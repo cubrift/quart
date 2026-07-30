@@ -1,7 +1,7 @@
 const { Poll } = require('../Poll');
 const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage, assistantMessage } = require('../MessageDatabase');
 const checkShouldRespond = require('./CheckShouldRespond');
-const { MODEL_NAME, EDIT_INTERVAL, CHECK_MODEL_NAME, MAX_MESSAGE_CONTEXT, TTS_MODEL_NAME, TRANSCRIPTION_MODEL_NAME } = require("../../Config");
+const { RESPONSE_MODEL, EDIT_INTERVAL, CHECK_MODEL, MAX_MESSAGE_CONTEXT, TTS_MODEL, TRANSCRIPTION_MODEL, TTS_VOICE } = require("../../Config");
 const { getSystemInstructions, ttsInstructions } = require("./SystemInstructions");
 const schema = require("./schemas/AISchema");
 
@@ -66,7 +66,7 @@ module.exports = async function messageAI(sock, msg, polls) {
   if (msg.message.audioMessage) {
     const { text } = await openai.audio.transcriptions.create({
       file: await OpenAI.toFile(await downloadMediaMessage(msg, "buffer"), "input.ogg"),
-      model: TRANSCRIPTION_MODEL_NAME,
+      model: TRANSCRIPTION_MODEL,
     }, { signal: controller.signal });
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
@@ -75,10 +75,10 @@ module.exports = async function messageAI(sock, msg, polls) {
   }
 
   if (isGroup
+      && !transcript
       && !msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(getRealLid(sock.user.lid))
       && !msg.message?.extendedTextMessage?.contextInfo?.nonJidMentions
       && !msgText?.toLowerCase?.()?.includes?.("quart")
-      && !transcript?.toLowerCase?.()?.includes?.("qu")
       && !await checkShouldRespond(model, messages, controller)) {
     if (activeGenerations.get(jid) === controller)
       activeGenerations.delete(jid);
@@ -86,36 +86,24 @@ module.exports = async function messageAI(sock, msg, polls) {
   }
 
   if (msg.message.audioMessage) {
-    await sock.sendPresenceUpdate('composing', jid);
-    const { _output } = await generateText({
-      model: model(MODEL_NAME),
-      abortSignal: controller.signal,
-      tools: {
-        web_search: oai.tools.webSearch()
-      },
-      onError: (err) => {
-        if (controller.signal.aborted) return; // Ignore abort errors completely
-        console.error("Stream internal error:", err);
-      },
-      system,
-      messages
-    });
-
-    console.log(_output);
-
     await sock.sendPresenceUpdate('recording', jid);
 
-    const res = await openai.audio.speech.create({
-      model: TTS_MODEL_NAME,
-      voice: "cedar",
-      input: _output,
-      instructions: "Speak in a cheerful and positive tone.",
-      response_format: "opus"
+    const res = await openai.chat.completions.create({
+      model: TTS_MODEL,
+      modalities: ["text", "audio"],
+      audio: { voice: TTS_VOICE, format: "opus" },
+      messages: [
+        ...messages,
+        {
+          role: "user",
+          content: transcript,
+        },
+      ]
     });
 
-    if (res.ok) {
-      const audioBuffer = Buffer.from(await res.arrayBuffer(), 'base64');
-      assistantMiscMessage(jid, _output);
+    if (res?.choices?.[0]) {
+      const audioBuffer = Buffer.from(res.choices[0].message.audio.data, 'base64');
+      assistantMiscMessage(jid, transcript);
 
       await sock.sendMessage(jid, {
         audio: audioBuffer,
@@ -138,7 +126,7 @@ module.exports = async function messageAI(sock, msg, polls) {
 
   try {
     ({ partialOutputStream, usage } = await streamText({
-      model: model(MODEL_NAME),
+      model: model(RESPONSE_MODEL),
       output: Output.object({ schema }),
       abortSignal: controller.signal,
       tools: {
@@ -258,7 +246,7 @@ module.exports = async function messageAI(sock, msg, polls) {
 
             await sock.sendPresenceUpdate('composing', jid);
             const { _output } = await generateText({
-              model: model(CHECK_MODEL_NAME),
+              model: model(CHECK_MODEL),
               output: Output.object({
                 schema: AIChooseGIFSchema(formattedCandidates.length)
               }),

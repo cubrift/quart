@@ -1,4 +1,4 @@
-const { MODEL_NAME, CHECK_MODEL_NAME, MAX_MESSAGE_CONTEXT } = require("../../Config");
+const { MAX_MESSAGE_CONTEXT, CHECK_MODEL } = require("../../Config");
 const schema = require("./schemas/CheckShouldRespondSchema");
 const { checkInstructions } = require("./SystemInstructions");
 const { generateText, Output } = require("ai");
@@ -8,7 +8,7 @@ module.exports = async function checkShouldRespond(model, messages, abortControl
   if (!messages.find(f => typeof f.content === 'string')) return false;
   try {
     const { _output } = await generateText({
-      model: model(CHECK_MODEL_NAME), // Always use cheapest model for quick processing and low quota
+      model: model(CHECK_MODEL), // Always use cheapest model for quick processing and low quota
       output: Output.object({ schema }),
       system: checkInstructions,
       abortSignal: abortController.signal,
