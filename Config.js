@@ -1,5 +1,5 @@
 module.exports = {
-    RESPONSE_MODEL: "gpt-5.6-luna",
+    RESPONSE_MODEL: "gpt-5.4-nano",
     TRANSCRIPTION_MODEL: "gpt-transcribe",
     TTS_MODEL: "gpt-audio-1.5",
     TTS_VOICE: "cedar",
