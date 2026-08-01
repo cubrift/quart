@@ -148,11 +148,8 @@ If you find something confusing, open an issue. Clear bugs and unclear docs are 
 - [x] Location sharing
 - [x] Local SQLite history
 - [x] Voice message support
-- [ ] Plugin system
-- [ ] Better long-term memory
-- [ ] Web dashboard
-- [ ] Cleaner modular architecture
-- [ ] More contributor-friendly tooling
+
+Feel free to add to the roadmap!
 
 ---
 
