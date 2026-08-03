@@ -71,8 +71,10 @@ async function startBot() {
 
       logger.fatal("Disconnected");
 
+      sock.end();
+
       if (shouldReconnect) {
-        startBot();
+        setTimeout(startBot, 5000);
       }
       else {
         logger.info("Logged out");
