@@ -69,17 +69,11 @@ gh repo clone cubrift/quart
 cd quart
 ```
 
-### Install dependencies:
+### Install dependencies & setup environment:
 
 ```bash
 npm install
-```
-
-### Create a ".env" file in the project root and add your environment variables:
-
-```
-OPENAI_API_KEY=your_openai_api_key_here
-GIPHY_API_KEY=your_giphy_api_key_here
+npm run setup
 ```
 
 ### Start Quart:
