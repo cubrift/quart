@@ -21,7 +21,7 @@ const qrcode = require("qrcode-terminal");
 const messageAI = require('./messages/ai/MessageAI');
 
 const crypto = require('crypto');
-const { PHONE_NUMBER } = require("./Config");
+const { PHONE_NUMBER, AUTH_DIR } = require("./Config");
 const { getRealLid } = require("./messages/Utils");
 const { logger, initialize } = require("./runtime/Globals");
 const { updateQRHost, stopQRHost } = require('./QRHost');
@@ -39,7 +39,7 @@ function getOptionHash(optionName) {
 }
 
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("./auth");
+  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
   const { version, error } = await fetchLatestWaWebVersion({});
 
   const sock = makeWASocket({
@@ -76,9 +76,9 @@ async function startBot() {
       }
       else {
         logger.info("Logged out");
-        if (await confirm("Delete /auth/* and reconnect? (y/n) ") === true) {
-          await rm("./auth", { recursive: true });
-          logger.info("Deleted /auth/*");
+        if (await confirm(`Delete ${AUTH_DIR}/* and reconnect? (y/n) `) === true) {
+          await rm(AUTH_DIR, { recursive: true });
+          logger.info(`Deleted ${AUTH_DIR}/*`);
           startBot();
         }
       }

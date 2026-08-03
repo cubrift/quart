@@ -3,15 +3,15 @@ const { version } = require('../package.json');
 const { logger, handleRejection } = require('./Logger');
 
 function validateEnv() {
-  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
+  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY', 'AUTH_DIR', 'DATABASE_PATH'];
   const missingVars = requiredEnvVars.filter(
     (key) => !process.env[key] || !process.env[key].trim()
   );
 
   if (missingVars.length > 0) {
-    logger.error(`Missing required API configuration: ${missingVars.join(', ')}`);
-    logger.error(`Please set the required environment variable(s) in your .env file.`);
-    logger.error(`Refer to .env.example or README.md for configuration details.`);
+    logger.fatal(`Missing required API configuration: ${missingVars.join(', ')}`);
+    logger.fatal(`Please set the required environment variable(s) in your .env file.`);
+    logger.fatal(`Refer to .env.example or README.md for configuration details.`);
     process.exit(1);
   }
 }
