@@ -194,11 +194,11 @@ module.exports = async function messageAI(sock, msg, polls) {
           const poll = new Poll(await sock.sendMessage(jid, m));
           poll.onVote = (vote, voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `voted for \"${vote}\" in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, jid, voteMsg, polls);
+            messageAI(sock, voteMsg, polls);
           }
           poll.onUnvote = (voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `unvoted in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, jid, voteMsg, polls);
+            messageAI(sock, voteMsg, polls);
           }
           polls.set(poll.msg.key.id, poll);
           assistantMiscMessage(jid, JSON.stringify(m));
