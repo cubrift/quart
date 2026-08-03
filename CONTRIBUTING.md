@@ -247,4 +247,8 @@ Quart is meant to be a fun and useful project, and contributors should feel welc
 
 If you are stuck, open an issue and explain what is happening. A clear question is usually enough to get things moving.
 
+---
+
 **Thanks again for helping build Quart!**
+
+Made with ❤ by David Skillman
