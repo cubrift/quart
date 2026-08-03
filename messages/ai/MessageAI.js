@@ -293,5 +293,5 @@ module.exports = async function messageAI(sock, msg, polls) {
 
   await sock.sendPresenceUpdate('paused', jid);
 
-  logger.debug(await usage, "Usage statistics");
+  logger.info(await usage, "Usage statistics");
 }
