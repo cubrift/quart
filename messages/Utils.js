@@ -3,19 +3,28 @@ const { downloadMediaMessage } = require("baileys");
 const getRealLid = lid => lid.replace(/:\d+@lid$/, '@lid');
 
 async function extractImageData(msg) {
-  const isImage = msg.message?.imageMessage;
-  const quotedImage = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  const directImage = msg.message?.imageMessage;
+  const quotedMessage =
+    msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  const quotedImage = quotedMessage?.imageMessage;
 
-  if (!isImage && !quotedImage) return null;
+  const imageMessage = directImage || quotedImage;
+
+  if (!imageMessage) return null;
+
+  const mediaMessage = directImage
+    ? msg
+    : { message: quotedMessage };
 
   const buffer = await downloadMediaMessage(
-    isImage ? msg : { message: quotedImage },
+    mediaMessage,
     'buffer',
     {}
   );
 
-  const base64Image = `data:image/jpeg;base64,${buffer.toString('base64')}`;
-  return base64Image;
+  const mimeType = imageMessage.mimetype || 'image/jpeg';
+
+  return `data:${mimeType};base64,${buffer.toString('base64')}`;
 }
 
 module.exports = {
