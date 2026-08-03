@@ -237,7 +237,7 @@ module.exports = async function messageAI(sock, msg, polls) {
   - Description: ${g.alt_text}`);
             logger.debug({ candidates: formattedCandidates }, "Fetched GIF candidates");
 
-            const selectorSystemPrompt = gifSelectionSystemInstructions(formattedCandidates);
+            const selectorSystemPrompt = gifSelectionSystemInstructions(message.gif.searchQuery, formattedCandidates);
 
             await sock.sendPresenceUpdate('composing', jid);
             const { _output } = await generateText({
