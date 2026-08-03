@@ -217,6 +217,7 @@ module.exports = async function messageAI(sock, msg, polls) {
           await sock.sendPresenceUpdate('composing', jid);
           try {
             async function repeatFetch(times) {
+              if (times <= 0) console.error("Failed to fetch GIFs after multiple attempts");
               try {
                 const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=${encodeURIComponent(message.gif.searchQuery)}`)
                 if (res.ok) return res;
