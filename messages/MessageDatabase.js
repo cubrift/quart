@@ -1,5 +1,5 @@
 const Database = require('better-sqlite3');
-const { extractImageData } = require('../Util');
+const { extractImageData } = require('./Utils');
 const db = new Database('chat_history.db');
 
 // Create table if it doesn't exist

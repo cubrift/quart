@@ -2,8 +2,6 @@ const { program } = require('commander');
 const { version } = require('../package.json');
 const { logger, handleRejection } = require('./Logger');
 
-const isDev = process.env.NODE_ENV !== 'production';
-
 function validateEnv() {
   const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
   const missingVars = requiredEnvVars.filter(
@@ -36,7 +34,6 @@ function initialize() {
 
 module.exports = {
   version,
-  isDev,
   logger: logger.child({ module: 'quart' }),
   initialize,
 };
