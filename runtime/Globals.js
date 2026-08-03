@@ -26,10 +26,17 @@ function initialize() {
     .version(version);
   
   program
-    .option('-t, --terminal', 'display the QR in the terminal');
-  
+    .option('-t, --terminal', 'display the QR in the terminal')
+    .option('-v, --verbose', 'enable verbose logging');
+
   program.parse(process.argv);
-  return program.opts();
+  const opts = program.opts();
+
+  if (opts.verbose) {
+    logger.level = 'debug';
+  }
+
+  return opts;
 }
 
 module.exports = {

@@ -71,7 +71,7 @@ module.exports = async function messageAI(sock, msg, polls) {
     }, { signal: controller.signal });
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
-    logger.info(text, "Recieved transcript");
+    logger.debug(text, "Recieved transcript");
     if (!text) return;
   }
 
@@ -82,7 +82,7 @@ module.exports = async function messageAI(sock, msg, polls) {
       && !await checkShouldRespond(model, messages, controller)) {
     if (activeGenerations.get(jid) === controller)
       activeGenerations.delete(jid);
-    logger.info("Ignoring text message");
+    logger.debug("Ignoring text message");
     return;
   }
 
@@ -118,7 +118,7 @@ module.exports = async function messageAI(sock, msg, polls) {
     return;
   }
 
-  logger.info("Responding...");
+  logger.debug("Responding...");
 
   await sock.sendPresenceUpdate('composing', jid);
 
@@ -143,7 +143,7 @@ module.exports = async function messageAI(sock, msg, polls) {
 
     if (controller.signal.aborted) return;
 
-    logger.info("Writing...");
+    logger.debug("Writing...");
 
     let fullResponse = null;
     let lastEdit = Date.now();
@@ -186,7 +186,7 @@ module.exports = async function messageAI(sock, msg, polls) {
               }
             });
           }
-          logger.info({ message: message.text, mentions }, "AI response");
+          logger.debug({ message: message.text, mentions }, "AI response");
           await sock.sendMessage(jid, { text: message.text, edit: key, mentions });
           assistantMessage(jid, message.text);
           key = null;
@@ -255,7 +255,7 @@ module.exports = async function messageAI(sock, msg, polls) {
                 return cleanMsg;
               })
             });
-            if (controller.signal.aborted) return logger.info("Aborted");
+            if (controller.signal.aborted) return logger.debug("Aborted");
             const selection = (_output?.selectedIndex - 1) ?? 0;
             const gif = data[selection];
             const url = gif?.images?.original?.mp4;
@@ -269,7 +269,7 @@ module.exports = async function messageAI(sock, msg, polls) {
               await sock.sendMessage(jid, { text: "_Unable to show GIF_" });
             }
             delete gif.images;
-            logger.info(gif, "Selected GIF");
+            logger.debug(gif, "Selected GIF");
             assistantMiscMessage(jid, JSON.stringify({
               type: "gif",
               title: gif.title,
@@ -293,5 +293,5 @@ module.exports = async function messageAI(sock, msg, polls) {
 
   await sock.sendPresenceUpdate('paused', jid);
 
-  logger.info(await usage, "Usage statistics");
+  logger.debug(await usage, "Usage statistics");
 }
