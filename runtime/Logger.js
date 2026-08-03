@@ -23,6 +23,5 @@ function handleRejection(reason, promise) {
 }
 
 module.exports = {
-  logger,
   handleRejection
 }
