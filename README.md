@@ -55,7 +55,7 @@ It is built to join conversations naturally, keep track of what is going on, and
 
 ## Prerequisites
 
-- Node.js v20 or higher
+- Node.js v22.12.0 or higher
 - A WhatsApp account
 - An OpenAI API key
 - A Giphy API key
