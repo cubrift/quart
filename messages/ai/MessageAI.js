@@ -1,18 +1,18 @@
+const { generateText, streamText, Output, tool } = require("ai");
+const { createOpenAI, openai: oai } = require('@ai-sdk/openai');
+const { downloadMediaMessage } = require('baileys');
+
 const { Poll } = require('../Poll');
 const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage, assistantMessage } = require('../MessageDatabase');
 const checkShouldRespond = require('./CheckShouldRespond');
 const { RESPONSE_MODEL, EDIT_INTERVAL, CHECK_MODEL, MAX_MESSAGE_CONTEXT, TTS_MODEL, TRANSCRIPTION_MODEL, TTS_VOICE } = require("../../Config");
-const { getSystemInstructions, ttsInstructions } = require("./SystemInstructions");
+const { getSystemInstructions, ttsInstructions, gifSelectionSystemInstructions } = require("./SystemInstructions");
 const schema = require("./schemas/AISchema");
-
-const { generateText, streamText, Output, tool } = require("ai");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
-const { createOpenAI, openai: oai } = require('@ai-sdk/openai');
 const { getRealLid, extractImageData } = require('../Utils');
-const { downloadMediaMessage } = require('baileys');
+const { logger } = require('../../runtime/Globals');
 
 const { default: OpenAI } = require('openai');
-const { logger } = require('../../runtime/Globals');
 const openai = new OpenAI();
 
 const model = createOpenAI({
@@ -237,14 +237,7 @@ module.exports = async function messageAI(sock, msg, polls) {
   - Description: ${g.alt_text}`);
             logger.debug({ candidates: formattedCandidates }, "Fetched GIF candidates");
 
-            const selectorSystemPrompt = `You are Quart's GIF selector module.
-  Quart wants to respond to the group chat with a GIF based on the search query: "${message.gif.searchQuery}".
-
-  Your task:
-  Analyze the recent group chat conversation and select the ONE GIF option (by index number) which title best fits the humor, mood, or joke of the situation.
-
-  Here are the candidate GIFs returned from the search:
-  ${formattedCandidates.join("\n")}`;
+            const selectorSystemPrompt = gifSelectionSystemInstructions(formattedCandidates);
 
             await sock.sendPresenceUpdate('composing', jid);
             const { _output } = await generateText({
