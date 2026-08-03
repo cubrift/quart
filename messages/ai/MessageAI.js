@@ -12,6 +12,7 @@ const { getRealLid, extractImageData } = require('../../Util');
 const { downloadMediaMessage } = require('baileys');
 
 const { default: OpenAI } = require('openai');
+const { logger } = require('../../Globals');
 const openai = new OpenAI();
 
 const model = createOpenAI({
@@ -70,7 +71,7 @@ module.exports = async function messageAI(sock, msg, polls) {
     }, { signal: controller.signal });
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
-    console.log(text);
+    logger.info(text, "Recieved transcript");
     if (!text) return;
   }
 
@@ -81,7 +82,8 @@ module.exports = async function messageAI(sock, msg, polls) {
       && !await checkShouldRespond(model, messages, controller)) {
     if (activeGenerations.get(jid) === controller)
       activeGenerations.delete(jid);
-    return console.log("Ignoring");
+    logger.info("Ignoring text message");
+    return;
   }
 
   if (msg.message.audioMessage) {
@@ -110,13 +112,13 @@ module.exports = async function messageAI(sock, msg, polls) {
         ptt: true
       });
     } else {
-      console.error("No audio data returned from the model.");
+      logger.error("No audio data returned from the model.");
     }
     await sock.sendPresenceUpdate('paused', jid);
     return;
   }
 
-  //console.log("Responding");
+  logger.info("Responding...");
 
   await sock.sendPresenceUpdate('composing', jid);
 
@@ -133,7 +135,7 @@ module.exports = async function messageAI(sock, msg, polls) {
       },
       onError: (err) => {
         if (controller.signal.aborted) return; // Ignore abort errors completely
-        console.error("Stream internal error:", err);
+        logger.error(err, "Stream internal error");
       },
       system,
       messages
@@ -141,7 +143,7 @@ module.exports = async function messageAI(sock, msg, polls) {
 
     if (controller.signal.aborted) return;
 
-    console.log("Writing");
+    logger.info("Writing...");
 
     let fullResponse = null;
     let lastEdit = Date.now();
@@ -149,7 +151,7 @@ module.exports = async function messageAI(sock, msg, polls) {
     let hitEnd = false;
     for await (const partial of partialOutputStream) {
       fullResponse = partial;
-      console.log(partial);
+      logger.debug(partial, "Partial response");
       if (!partial.messages) continue;
       for (const message of partial.messages) {
         if (controller.signal.aborted) break;
@@ -165,7 +167,7 @@ module.exports = async function messageAI(sock, msg, polls) {
               });
               lastEdit = Date.now();
             } catch (e) {
-              console.warn("Edit skipped:", e.message);
+              logger.warn(e, "Skipping edit due to error");
             }
           }
         }
@@ -178,13 +180,13 @@ module.exports = async function messageAI(sock, msg, polls) {
           if (isGroup) {
             const { participants } = await sock.groupMetadata(jid);
             participants.forEach(f => {
-              console.log(message.text, f.id);
               if (message.text.includes("@" + f.id.split("@")[0]))
               {
                 mentions.push(f.id);
               }
             });
           }
+          logger.info({ message: message.text, mentions }, "AI response");
           await sock.sendMessage(jid, { text: message.text, edit: key, mentions });
           assistantMessage(jid, message.text);
           key = null;
@@ -217,14 +219,14 @@ module.exports = async function messageAI(sock, msg, polls) {
           await sock.sendPresenceUpdate('composing', jid);
           try {
             async function repeatFetch(times) {
-              if (times <= 0) console.error("Failed to fetch GIFs after multiple attempts");
+              if (times <= 0) logger.error("Failed to fetch GIFs after 10 attempts");
               try {
                 const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=${encodeURIComponent(message.gif.searchQuery)}`)
                 if (res.ok) return res;
                 else return repeatFetch(times - 1);
               }
-              catch ({ error }) {
-                console.log(error);
+              catch (error) {
+                logger.error(error, "Error fetching GIFs");
                 return repeatFetch(times - 1);
               }
             }
@@ -233,7 +235,7 @@ module.exports = async function messageAI(sock, msg, polls) {
             const formattedCandidates = data.map((g, i) => `Option ${i+1}:
   - Title: ${g.title}
   - Description: ${g.alt_text}`);
-            console.log(formattedCandidates);
+            logger.debug({ candidates: formattedCandidates }, "Fetched GIF candidates");
 
             const selectorSystemPrompt = `You are Quart's GIF selector module.
   Quart wants to respond to the group chat with a GIF based on the search query: "${message.gif.searchQuery}".
@@ -260,7 +262,7 @@ module.exports = async function messageAI(sock, msg, polls) {
                 return cleanMsg;
               })
             });
-            if (controller.signal.aborted) return console.log("Aborted");
+            if (controller.signal.aborted) return logger.info("Aborted");
             const selection = (_output?.selectedIndex - 1) ?? 0;
             const gif = data[selection];
             const url = gif?.images?.original?.mp4;
@@ -274,7 +276,7 @@ module.exports = async function messageAI(sock, msg, polls) {
               await sock.sendMessage(jid, { text: "_Unable to show GIF_" });
             }
             delete gif.images;
-            console.log(gif);
+            logger.info(gif, "Selected GIF");
             assistantMiscMessage(jid, JSON.stringify({
               type: "gif",
               title: gif.title,
@@ -282,7 +284,7 @@ module.exports = async function messageAI(sock, msg, polls) {
             }));
           }
           catch (e) {
-            console.error(e);
+            logger.error(e, "Error fetching GIFs");
             await sock.sendMessage(jid, { text: "_No GIF available._" });
             await sock.sendPresenceUpdate('paused', jid);
           }
@@ -291,13 +293,12 @@ module.exports = async function messageAI(sock, msg, polls) {
     }
   }
   catch (e) {
-    console.log("e");
-    console.error(e);
+    logger.error(e, "Error occurred during AI response generation");
     await sock.sendPresenceUpdate('paused', jid);
     return;
   }
 
   await sock.sendPresenceUpdate('paused', jid);
 
-  console.log(await usage);
+  logger.info(await usage, "Usage statistics");
 }

@@ -69,7 +69,7 @@ async function startBot() {
       const shouldReconnect =
         lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
 
-      logger.error("Disconnected");
+      logger.fatal("Disconnected");
 
       if (shouldReconnect) {
         startBot();
@@ -139,7 +139,7 @@ async function startBot() {
         messageAI(sock, msg, polls);
       }
     } catch (error) {
-      console.error("GETGJTEOGJETOHGETJHOTEJJEH", error);
+      logger.error(error, "Error in messages.upsert event");
     }
   });
 }
