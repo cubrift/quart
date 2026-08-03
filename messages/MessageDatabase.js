@@ -26,17 +26,16 @@ function saveMessage(jid, role, content) {
 }
 
 // Get last N messages for AI context
-function getRecentHistory(jid, limit = 999999999) {
+function getRecentHistory(jid) {
   const stmt = db.prepare(`
     SELECT role, content FROM (
       SELECT role, content, id FROM messages 
       WHERE jid = ? 
-      ORDER BY id DESC 
-      LIMIT ?
+      ORDER BY id DESC
     ) ORDER BY id ASC
   `);
   
-  return stmt.all(jid, limit).map(msg => {
+  return stmt.all(jid).map(msg => {
     if (msg.role === "image") return {
       role: "user",
       content: [
