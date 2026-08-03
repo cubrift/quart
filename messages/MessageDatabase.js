@@ -68,6 +68,7 @@ function assistantMiscMessage(jid, content) {
 }
 
 module.exports = {
+  db,
   saveMessage,
   userMessage,
   userMiscMessage,

@@ -26,6 +26,7 @@ const { getRealLid } = require("./messages/Utils");
 const { logger, initialize } = require("./runtime/Globals");
 const { updateQRHost, stopQRHost } = require('./runtime/QRHost');
 const { rm } = require('fs/promises');
+const { db } = require('./messages/MessageDatabase');
 
 const options = initialize();
 
@@ -48,6 +49,15 @@ async function startBot() {
     logger: logger.child({ module: 'baileys' }),
     browser: [ 'Quart', 'Desktop', '1.0' ]
   });
+
+  function gracefulShutdown() {
+    sock.end();
+    stopQRHost();
+    if (db) db.close();
+  }
+
+  process.on('SIGINT', gracefulShutdown);
+  process.on('SIGTERM', gracefulShutdown);
 
   sock.ev.on("connection.update", async ({ connection, qr, lastDisconnect }) => {
     if (qr) {
