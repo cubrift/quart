@@ -1,4 +1,5 @@
 const { MAX_MESSAGE_CONTEXT, CHECK_MODEL } = require("../../Config");
+const { logger } = require("../../runtime/Globals");
 const schema = require("./schemas/CheckShouldRespondSchema");
 const { checkInstructions } = require("./SystemInstructions");
 const { generateText, Output } = require("ai");
