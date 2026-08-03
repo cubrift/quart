@@ -1,15 +1,8 @@
-const pino = require('pino');
-const pretty = require('pino-pretty');
 const { program } = require('commander');
-
-const { version } = require('./package.json');
+const { version } = require('../package.json');
+const { logger, handleRejection } = require('./Logger');
 
 const isDev = process.env.NODE_ENV !== 'production';
-
-const logger = pino(
-  { level: process.env.LOG_LEVEL || 'info' },
-  isDev ? pretty({ colorize: true }) : undefined
-);
 
 function validateEnv() {
   const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
@@ -23,20 +16,6 @@ function validateEnv() {
     logger.error(`Refer to .env.example or README.md for configuration details.`);
     process.exit(1);
   }
-}
-
-function handleRejection(reason, promise) {
-  const isAbort = 
-    reason?.name === 'AbortError' || 
-    reason?.message?.includes('aborted') || 
-    reason?.code === 'ABORT_ERR';
-
-  if (isAbort) {
-    logger.info('Async task was cancelled via AbortSignal.');
-    return; 
-  }
-
-  logger.error(reason, 'Unhandled rejection');
 }
 
 function initialize() {

@@ -22,8 +22,8 @@ const messageAI = require('./messages/ai/MessageAI');
 
 const crypto = require('crypto');
 const { PHONE_NUMBER } = require("./Config");
-const { getRealLid } = require("./Util");
-const { logger, initialize } = require("./Globals");
+const { getRealLid } = require("./messages/Utils");
+const { logger, initialize } = require("./runtime/Globals");
 const { updateQRHost, stopQRHost } = require('./QRHost');
 const { rm } = require('fs/promises');
 

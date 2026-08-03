@@ -8,11 +8,11 @@ const schema = require("./schemas/AISchema");
 const { generateText, streamText, Output, tool } = require("ai");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
 const { createOpenAI, openai: oai } = require('@ai-sdk/openai');
-const { getRealLid, extractImageData } = require('../../Util');
+const { getRealLid, extractImageData } = require('../Utils');
 const { downloadMediaMessage } = require('baileys');
 
 const { default: OpenAI } = require('openai');
-const { logger } = require('../../Globals');
+const { logger } = require('../../runtime/Globals');
 const openai = new OpenAI();
 
 const model = createOpenAI({
