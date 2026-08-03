@@ -24,7 +24,7 @@ const crypto = require('crypto');
 const { PHONE_NUMBER, AUTH_DIR } = require("./Config");
 const { getRealLid } = require("./messages/Utils");
 const { logger, initialize } = require("./runtime/Globals");
-const { updateQRHost, stopQRHost } = require('./QRHost');
+const { updateQRHost, stopQRHost } = require('./runtime/QRHost');
 const { rm } = require('fs/promises');
 
 const options = initialize();

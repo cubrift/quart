@@ -1,6 +1,6 @@
 const express = require('express');
 const QRCode = require('qrcode');
-const { logger } = require('./runtime/Globals');
+const { logger } = require('./Globals');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
