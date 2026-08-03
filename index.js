@@ -2,42 +2,7 @@
 
 require('dotenv').config({ quiet: true }); 
 
-function validateEnv() {
-  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
-  const missingVars = requiredEnvVars.filter(
-    (key) => !process.env[key] || !process.env[key].trim()
-  );
-
-  if (missingVars.length > 0) {
-    console.error(`\n[ERROR] Missing required API configuration: ${missingVars.join(', ')}`);
-    console.error(`Please set the required environment variable(s) in your .env file.`);
-    console.error(`Refer to .env.example or README.md for configuration details.\n`);
-    process.exit(1);
-  }
-}
-
-validateEnv();
-
-
-// Catches unhandled promise rejections (like background stream aborts)
-process.on('unhandledRejection', (reason, promise) => {
-  const isAbort = 
-    reason?.name === 'AbortError' || 
-    reason?.message?.includes('aborted') || 
-    reason?.code === 'ABORT_ERR';
-
-  if (isAbort) {
-    console.log('[INFO] Async task was cancelled via AbortSignal.');
-    return; 
-  }
-
-  console.error('[UNHANDLED REJECTION]', reason);
-});
-
-const { program } = require('commander');
-const prompt = require('prompt-sync')();
-
-const { version } = require('./package.json');
+const { confirm } = require('@clack/prompts');
 
 const {
   default: makeWASocket,
@@ -58,20 +23,13 @@ const messageAI = require('./messages/ai/MessageAI');
 const crypto = require('crypto');
 const { PHONE_NUMBER } = require("./Config");
 const { getRealLid } = require("./Util");
+const { logger, initialize } = require("./Globals");
 const { updateQRHost, stopQRHost } = require('./QRHost');
 const { rm } = require('fs/promises');
 
-program
-  .name('quart')
-  .description('An AI chatbot built for WhatsApp hosted using Baileys.')
-  .version(version);
+const options = initialize();
 
-program
-  .option('-v, --verbose', 'enable verbose output')
-  .option('-t, --terminal', 'display the QR in the terminal');
-
-program.parse(process.argv);
-const options = program.opts();
+const polls = new Map();
 
 function getOptionHash(optionName) {
   return crypto
@@ -80,8 +38,6 @@ function getOptionHash(optionName) {
     .digest();
 }
 
-const polls = new Map();
-
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./auth");
   const { version, error } = await fetchLatestWaWebVersion({});
@@ -89,14 +45,14 @@ async function startBot() {
   const sock = makeWASocket({
     version,
     auth: state,
-    logger: pino(options.verbose ? {} : { level: "silent" }),
+    logger: logger.child({ module: 'baileys' }),
     browser: [ 'Quart', 'Desktop', '1.0' ]
   });
 
   sock.ev.on("connection.update", async ({ connection, qr, lastDisconnect }) => {
     if (qr) {
       console.clear();
-      console.log("QR Updated");
+      logger.info("QR Updated");
       if (options.terminal)
         qrcode.generate(qr, { small: true });
       else
@@ -105,25 +61,24 @@ async function startBot() {
 
     if (connection === "open") {
       stopQRHost();
-      console.log("√ Connected!");
-      console.log(sock.user?.lid);
+      logger.info("Connected!");
+      logger.debug(sock.user, "User");
     }
 
     if (connection === "close") {
       const shouldReconnect =
         lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
 
-      console.log("Disconnected");
+      logger.fatal("Disconnected");
 
       if (shouldReconnect) {
         startBot();
       }
       else {
-        console.log("Logged out")
-        if (prompt("Delete /auth/* and reconnect? (y/n) ").trim() === "y")
-        {
+        logger.info("Logged out");
+        if (await confirm("Delete /auth/* and reconnect? (y/n) ") === true) {
           await rm("./auth", { recursive: true });
-          console.log("Deleted /auth/*");
+          logger.info("Deleted /auth/*");
           startBot();
         }
       }
@@ -184,7 +139,7 @@ async function startBot() {
         messageAI(sock, msg, polls);
       }
     } catch (error) {
-      console.error("GETGJTEOGJETOHGETJHOTEJJEH", error);
+      logger.error(error, "Error in messages.upsert event");
     }
   });
 }

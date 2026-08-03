@@ -1,5 +1,6 @@
 const express = require('express');
 const QRCode = require('qrcode');
+const { logger } = require('./Globals');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -78,7 +79,7 @@ function updateQRHost(qrData) {
     });
 
     server = app.listen(PORT, () => {
-      console.log(`QR Web Server running on port ${PORT}`);
+      logger.info({ port: PORT }, 'QR Web Server running');
     });
   }
 }
@@ -87,7 +88,7 @@ function stopQRHost() {
   if (server) {
     currentQrData = null;
     server.close(() => {
-      console.log('QR Web Server stopped.');
+      logger.info('QR Web Server stopped');
     });
   }
 }

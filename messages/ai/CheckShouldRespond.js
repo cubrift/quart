@@ -14,11 +14,11 @@ module.exports = async function checkShouldRespond(model, messages, abortControl
       abortSignal: abortController.signal,
       messages: messages.slice(-10)
     });
-    console.log(_output);
+    logger.debug(_output, 'Check should respond output');
     if (abortController.signal.aborted) return false;
     return _output.shouldRespond;
   } catch (error) {
-    console.error(error);
+    logger.error(error, 'Error occurred while checking if response is needed');
     if (abortController.signal.aborted) return false;
     return checkShouldRespond(model, messages, abortController);
   }

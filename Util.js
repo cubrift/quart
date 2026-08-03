@@ -19,6 +19,6 @@ async function extractImageData(msg) {
 }
 
 module.exports = {
-    getRealLid,
-    extractImageData
+  getRealLid,
+  extractImageData
 };
