@@ -78,7 +78,7 @@ npm install
 ### Create a ".env" file in the project root and add your environment variables:
 
 ```
-OPEN_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 GIPHY_API_KEY=your_giphy_api_key_here
 ```
 

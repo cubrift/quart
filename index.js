@@ -2,6 +2,23 @@
 
 require('dotenv').config({ quiet: true }); 
 
+function validateEnv() {
+  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
+  const missingVars = requiredEnvVars.filter(
+    (key) => !process.env[key] || !process.env[key].trim()
+  );
+
+  if (missingVars.length > 0) {
+    console.error(`\n[ERROR] Missing required API configuration: ${missingVars.join(', ')}`);
+    console.error(`Please set the required environment variable(s) in your .env file.`);
+    console.error(`Refer to .env.example or README.md for configuration details.\n`);
+    process.exit(1);
+  }
+}
+
+validateEnv();
+
+
 // Catches unhandled promise rejections (like background stream aborts)
 process.on('unhandledRejection', (reason, promise) => {
   const isAbort = 
