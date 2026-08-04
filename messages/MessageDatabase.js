@@ -69,6 +69,16 @@ function assistantMiscMessage(jid, content) {
   return assistantMessage(jid, " " + content); // temporary
 }
 
+function deleteMessagesBefore(timestamp) {
+  if (typeof timestamp !== 'number' || !Number.isFinite(timestamp) || timestamp < 0) {
+    throw new TypeError('Invalid timestamp: must be a non-negative finite number');
+  }
+
+  const stmt = db.prepare('DELETE FROM messages WHERE timestamp < ?');
+  const info = stmt.run(timestamp);
+  return info.changes;
+}
+
 module.exports = {
   db,
   saveMessage,
@@ -77,5 +87,6 @@ module.exports = {
   imageMessage,
   assistantMessage,
   assistantMiscMessage,
-  getRecentHistory
+  getRecentHistory,
+  deleteMessagesBefore
 };
