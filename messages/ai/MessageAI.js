@@ -21,6 +21,13 @@ const model = createOpenAI({
 
 const activeGenerations = new Map();
 
+shutdownStack.push(() => {
+  for (const controller of activeGenerations.values()) {
+    controller.abort();
+  }
+  activeGenerations.clear();
+});
+
 module.exports = async function messageAI(sock, msg) {
   const jid = msg?.key?.remoteJid;
   const isStatus = jid?.startsWith("status");
@@ -287,6 +294,8 @@ module.exports = async function messageAI(sock, msg) {
     logger.error(e, "Error occurred during AI response generation");
     return;
   }
+
+  activeGenerations.delete(jid);
 
   logger.info(await usage, "Usage statistics");
 }

@@ -2,6 +2,24 @@ const { program } = require('commander');
 const { version } = require('../package.json');
 const { logger, handleRejection } = require('./Logger');
 
+const logger = logger.child({ module: 'quart' });
+
+const shutdownStack = [];
+
+function shutdown() {
+  logger.info('Shutting down...');
+  for (const shutdownFunc of shutdownStack) {
+    if (!shutdownFunc) continue;
+    try {
+      shutdownFunc();
+    } catch (err) {
+      logger.error(err, 'Error during shutdown');
+      process.exit(1);
+    }
+  }
+  process.exit(0);
+}
+
 function validateEnv() {
   const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
   const missingVars = requiredEnvVars.filter(
@@ -41,6 +59,8 @@ function initialize() {
 
 module.exports = {
   version,
-  logger: logger.child({ module: 'quart' }),
+  shutdownStack,
+  logger,
   initialize,
+  shutdown
 };
