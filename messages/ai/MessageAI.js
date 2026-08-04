@@ -2,7 +2,7 @@ const { generateText, streamText, Output, tool } = require("ai");
 const { createOpenAI, openai: oai } = require('@ai-sdk/openai');
 const { downloadMediaMessage } = require('baileys');
 
-const { Poll } = require('../Poll');
+const { Poll, polls } = require('../Poll');
 const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage, assistantMessage } = require('../MessageDatabase');
 const checkShouldRespond = require('./CheckShouldRespond');
 const { RESPONSE_MODEL, EDIT_INTERVAL, CHECK_MODEL, MAX_MESSAGE_CONTEXT, TTS_MODEL, TRANSCRIPTION_MODEL, TTS_VOICE } = require("../../Config");
@@ -21,7 +21,7 @@ const model = createOpenAI({
 
 const activeGenerations = new Map();
 
-module.exports = async function messageAI(sock, msg, polls) {
+module.exports = async function messageAI(sock, msg) {
   const jid = msg?.key?.remoteJid;
   const isStatus = jid?.startsWith("status");
   const isGroup = jid?.endsWith('@g.us');
@@ -195,11 +195,11 @@ module.exports = async function messageAI(sock, msg, polls) {
           const poll = new Poll(await sock.sendMessage(jid, m));
           poll.onVote = (vote, voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `voted for \"${vote}\" in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, voteMsg, polls);
+            messageAI(sock, voteMsg);
           }
           poll.onUnvote = (voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `unvoted in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, voteMsg, polls);
+            messageAI(sock, voteMsg);
           }
           polls.set(poll.msg.key.id, poll);
           assistantMiscMessage(jid, JSON.stringify(m));

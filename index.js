@@ -27,10 +27,9 @@ const { logger, initialize } = require("./runtime/Globals");
 const { updateQRHost, stopQRHost } = require('./runtime/QRHost');
 const { rm } = require('fs/promises');
 const { db } = require('./messages/MessageDatabase');
+const { handlePollMessage } = require('./messages/Poll');
 
 const options = initialize();
-
-const polls = new Map();
 
 function getOptionHash(optionName) {
   return crypto
@@ -107,48 +106,8 @@ async function startBot() {
         const jid = msg.key.remoteJid;
         if (!jid) continue;
         
-        const update = msg.message?.pollUpdateMessage;
-        if (update) {
-          const pollKey = update.pollCreationMessageKey;
-
-          const poll = polls.get(pollKey.id);
-          if (poll) {
-            const secret =
-              poll.msg.message.messageContextInfo.messageSecret;
-
-            // THIS IS STUPID BECAUSE BAILEYS IS STUPID
-            const pollCreatorJid = poll.msg.key.fromMe
-              ? getRealLid(sock.user.lid)
-              : poll.msg.key.participant;
-
-            const voterJid = msg.key.fromMe
-              ? getRealLid(sock.user.lid)
-              : msg.key.remoteJid.endsWith('@g.us')
-                ? msg.key.participant
-                : msg.key.remoteJid;
-
-            const result = decryptPollVote(update.vote, {
-              pollCreatorJid,
-              pollMsgId: poll.msg.key.id,
-              pollEncKey: secret,
-              voterJid
-            });
-
-            const selected = result.selectedOptions[0];
-            if (selected) {
-              const option = poll.msg.message.pollCreationMessageV3.options.find(
-                opt => Buffer.compare(getOptionHash(opt.optionName), selected) === 0
-              );
-
-              poll.onVote?.(option.optionName, msg);
-            }
-            else {
-              poll.onUnvote?.(msg);
-            }
-          }
-          continue;
-        }
-        messageAI(sock, msg, polls);
+        if (handlePollMessage(sock, msg)) continue;
+        messageAI(sock, msg);
         await sock.sendPresenceUpdate('paused', jid);
       }
     } catch (error) {
