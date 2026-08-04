@@ -21,11 +21,12 @@ const qrcode = require("qrcode-terminal");
 const messageAI = require('./messages/ai/MessageAI');
 
 const crypto = require('crypto');
-const { PHONE_NUMBER } = require("./Config");
+const { PHONE_NUMBER, AUTH_DIR } = require("./Config");
 const { getRealLid } = require("./messages/Utils");
 const { logger, initialize } = require("./runtime/Globals");
-const { updateQRHost, stopQRHost } = require('./QRHost');
+const { updateQRHost, stopQRHost } = require('./runtime/QRHost');
 const { rm } = require('fs/promises');
+const { db } = require('./messages/MessageDatabase');
 
 const options = initialize();
 
@@ -39,7 +40,7 @@ function getOptionHash(optionName) {
 }
 
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("./auth");
+  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
   const { version, error } = await fetchLatestWaWebVersion({});
 
   const sock = makeWASocket({
@@ -48,6 +49,15 @@ async function startBot() {
     logger: logger.child({ module: 'baileys' }),
     browser: [ 'Quart', 'Desktop', '1.0' ]
   });
+
+  function gracefulShutdown() {
+    sock.end();
+    stopQRHost();
+    if (db) db.close();
+  }
+
+  process.on('SIGINT', gracefulShutdown);
+  process.on('SIGTERM', gracefulShutdown);
 
   sock.ev.on("connection.update", async ({ connection, qr, lastDisconnect }) => {
     if (qr) {
@@ -71,14 +81,16 @@ async function startBot() {
 
       logger.fatal("Disconnected");
 
+      sock.end();
+
       if (shouldReconnect) {
-        startBot();
+        setTimeout(startBot, 5000);
       }
       else {
         logger.info("Logged out");
-        if (await confirm("Delete /auth/* and reconnect? (y/n) ") === true) {
-          await rm("./auth", { recursive: true });
-          logger.info("Deleted /auth/*");
+        if (await confirm(`Delete ${AUTH_DIR}/* and reconnect? (y/n) `) === true) {
+          await rm(AUTH_DIR, { recursive: true });
+          logger.info(`Deleted ${AUTH_DIR}/*`);
           startBot();
         }
       }
@@ -137,6 +149,7 @@ async function startBot() {
           continue;
         }
         messageAI(sock, msg, polls);
+        await sock.sendPresenceUpdate('paused', jid);
       }
     } catch (error) {
       logger.error(error, "Error in messages.upsert event");

@@ -36,6 +36,9 @@ function updateQRHost(qrData) {
   <head>
     <title>QR Code for Quart</title>
     <style>
+      * {
+        font-family: sans-serif;
+      }
       body {
         display: flex;
         flex-direction: column;
