@@ -6,9 +6,10 @@
   "bin": {
     "quart": "./index.js"
   },
-  "scripts": {
-    "setup": "node scripts/setup.js"
-  },
+"scripts": {
+  "setup": "node scripts/setup.js",
+  "test": "node --test"
+},
   "keywords": [],
   "author": "cubrift.io",
   "license": "ISC",
