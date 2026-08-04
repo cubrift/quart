@@ -4,7 +4,7 @@ const schema = require("./schemas/CheckShouldRespondSchema");
 const { checkInstructions } = require("./SystemInstructions");
 const { generateText, Output } = require("ai");
 
-module.exports = async function checkShouldRespond(model, messages, abortController, retries = 0) {
+module.exports = async function checkShouldRespond(model, messages, abortController, retries = 5) {
   if (!messages) return false;
   if (!messages.find(f => typeof f.content === 'string')) return false;
   try {
@@ -20,7 +20,7 @@ module.exports = async function checkShouldRespond(model, messages, abortControl
     return _output.shouldRespond;
   } catch (error) {
     logger.error(error, 'Error occurred while checking if response is needed');
-    if (abortController.signal.aborted || retries >= 1) return false;
-    return checkShouldRespond(model, messages, abortController, retries + 1);
+    if (abortController.signal.aborted || retries <= 0) return false;
+    return checkShouldRespond(model, messages, abortController, retries - 1);
   }
 }
