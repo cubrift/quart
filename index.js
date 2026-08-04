@@ -23,7 +23,7 @@ const messageAI = require('./messages/ai/MessageAI');
 const crypto = require('crypto');
 const { PHONE_NUMBER, AUTH_DIR } = require("./Config");
 const { getRealLid } = require("./messages/Utils");
-const { logger, initialize } = require("./runtime/Globals");
+const { logger, initialize, shutdown } = require("./runtime/Globals");
 const { updateQRHost, stopQRHost } = require('./runtime/QRHost');
 const { rm } = require('fs/promises');
 const { db } = require('./messages/MessageDatabase');
@@ -49,15 +49,14 @@ async function startBot() {
     browser: [ 'Quart', 'Desktop', '1.0' ]
   });
 
-  function gracefulShutdown() {
-    sock.end();
-    stopQRHost();
-    if (db) db.close();
-    process.exit(-1);
-  }
+  shutdownStack.push(
+    sock.end,
+    stopQRHost,
+    db?.close
+  );
 
-  process.on('SIGINT', gracefulShutdown);
-  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 
   sock.ev.on("connection.update", async ({ connection, qr, lastDisconnect }) => {
     if (qr) {
