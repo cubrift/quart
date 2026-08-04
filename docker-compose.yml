@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  quart-bot:
+    build: .
+    container_name: quart-bot
+    restart: unless-stopped
+    # Required for interactive prompts and terminal QR rendering
+    tty: true
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    volumes:
+      # Persist setup env, app data, and auth session
+      - ./.env:/app/.env
+      - ./data:/app/data
+      - ./auth_info_baileys:/app/auth_info_baileys
+    # Default command (Browser mode). Change to "node setup.js && quart -t" for Terminal QR mode!
+    command: sh -c "node setup.js && quart"
