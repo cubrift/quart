@@ -149,6 +149,14 @@ module.exports = async function messageAI(sock, msg, polls) {
     let lastEdit = Date.now();
     let key = null;
     let hitEnd = false;
+    let participantIds = [];
+
+    if (isGroup) {
+      participantIds = (await sock.groupMetadata(jid))
+        .participants
+        .map(p => p.id);
+    }
+
     for await (const partial of partialOutputStream) {
       fullResponse = partial;
       logger.debug(partial, "Partial response");
@@ -177,12 +185,11 @@ module.exports = async function messageAI(sock, msg, polls) {
         } // it is not done yet
         if (message.text) {
           let mentions = [];
+
           if (isGroup) {
-            const { participants } = await sock.groupMetadata(jid);
-            participants.forEach(f => {
-              if (message.text.includes("@" + f.id.split("@")[0]))
-              {
-                mentions.push(f.id);
+            participantIds.forEach(id => {
+              if (message.text.includes("@" + id.split("@")[0])) {
+                mentions.push(id);
               }
             });
           }
