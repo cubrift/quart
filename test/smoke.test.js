@@ -37,6 +37,7 @@ test("Config exposes expected properties", () => {
     assert.equal(typeof config.TTS_MODEL, "string");
     assert.equal(typeof config.TTS_VOICE, "string");
     assert.equal(typeof config.CHECK_MODEL, "string");
+    assert.equal(typeof config.MAX_MESSAGE_CONTEXT, "number");
     assert.equal(typeof config.EDIT_INTERVAL, "number");
 });
 
