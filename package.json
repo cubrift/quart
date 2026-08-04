@@ -1,6 +1,6 @@
 {
   "name": "quart",
-  "version": "1.3.9",
+  "version": "1.3.13",
   "description": "Quart is a conversational AI chatbot for WhatsApp",
   "main": "index.js",
   "bin": {
