@@ -11,7 +11,9 @@ db.exec(`
     role TEXT NOT NULL,
     content TEXT NOT NULL,
     timestamp INTEGER NOT NULL
-  )
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_messages_jid_id ON messages(jid, id);
 `);
 
 // Save incoming/outgoing text message
