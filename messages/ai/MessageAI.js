@@ -114,7 +114,6 @@ module.exports = async function messageAI(sock, msg, polls) {
     } else {
       logger.error("No audio data returned from the model.");
     }
-    await sock.sendPresenceUpdate('paused', jid);
     return;
   }
 
@@ -279,7 +278,6 @@ module.exports = async function messageAI(sock, msg, polls) {
           catch (e) {
             logger.error(e, "Error fetching GIFs");
             await sock.sendMessage(jid, { text: "_No GIF available._" });
-            await sock.sendPresenceUpdate('paused', jid);
           }
         }
       }
@@ -287,11 +285,8 @@ module.exports = async function messageAI(sock, msg, polls) {
   }
   catch (e) {
     logger.error(e, "Error occurred during AI response generation");
-    await sock.sendPresenceUpdate('paused', jid);
     return;
   }
-
-  await sock.sendPresenceUpdate('paused', jid);
 
   logger.info(await usage, "Usage statistics");
 }

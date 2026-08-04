@@ -149,6 +149,7 @@ async function startBot() {
           continue;
         }
         messageAI(sock, msg, polls);
+        await sock.sendPresenceUpdate('paused', jid);
       }
     } catch (error) {
       logger.error(error, "Error in messages.upsert event");
