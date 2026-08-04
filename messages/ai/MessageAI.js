@@ -155,6 +155,7 @@ module.exports = async function messageAI(sock, msg) {
     let lastEdit = Date.now();
     let key = null;
     let hitEnd = false;
+    const groupParticipants = isGroup ? (await sock.groupMetadata(jid))?.participants || [] : [];
     for await (const partial of partialOutputStream) {
       fullResponse = partial;
       logger.debug(partial, "Partial response");
@@ -184,8 +185,7 @@ module.exports = async function messageAI(sock, msg) {
         if (message.text) {
           let mentions = [];
           if (isGroup) {
-            const { participants } = await sock.groupMetadata(jid);
-            participants.forEach(f => {
+            groupParticipants.forEach(f => {
               if (message.text.includes("@" + f.id.split("@")[0]))
               {
                 mentions.push(f.id);
