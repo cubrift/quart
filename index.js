@@ -87,7 +87,7 @@ async function startBot() {
       }
       else {
         logger.info("Logged out");
-        if (await confirm(`Delete ${AUTH_DIR}/* and reconnect? (y/n) `) === true) {
+        if (await confirm({ message: `Delete ${AUTH_DIR}/* and reconnect? (y/n) ` }) === true) {
           await rm(AUTH_DIR, { recursive: true });
           logger.info(`Deleted ${AUTH_DIR}/*`);
           startBot();
