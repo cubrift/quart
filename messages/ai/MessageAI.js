@@ -71,7 +71,7 @@ module.exports = async function messageAI(sock, msg, polls) {
     }, { signal: controller.signal });
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
-    logger.debug(text, "Recieved transcript");
+    logger.debug(text, "Received transcript");
     if (!text) return;
   }
 
