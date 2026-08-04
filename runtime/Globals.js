@@ -3,7 +3,7 @@ const { version } = require('../package.json');
 const { logger, handleRejection } = require('./Logger');
 
 function validateEnv() {
-  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY', 'AUTH_DIR', 'DATABASE_PATH'];
+  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
   const missingVars = requiredEnvVars.filter(
     (key) => !process.env[key] || !process.env[key].trim()
   );
