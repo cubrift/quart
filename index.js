@@ -53,6 +53,7 @@ async function startBot() {
     sock.end();
     stopQRHost();
     if (db) db.close();
+    process.exit(-1);
   }
 
   process.on('SIGINT', gracefulShutdown);
