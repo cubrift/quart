@@ -2,7 +2,7 @@ const { generateText, streamText, Output, tool } = require("ai");
 const { createOpenAI, openai: oai } = require('@ai-sdk/openai');
 const { downloadMediaMessage } = require('baileys');
 
-const { Poll } = require('../Poll');
+const { Poll, polls } = require('../Poll');
 const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage, assistantMessage } = require('../MessageDatabase');
 const checkShouldRespond = require('./CheckShouldRespond');
 const { RESPONSE_MODEL, EDIT_INTERVAL, CHECK_MODEL, MAX_MESSAGE_CONTEXT, TTS_MODEL, TRANSCRIPTION_MODEL, TTS_VOICE } = require("../../Config");
@@ -22,6 +22,16 @@ const model = createOpenAI({
 });
 
 module.exports = async function messageAI(sock, msg, polls) {
+const activeGenerations = new Map();
+
+shutdownStack.push(() => {
+  for (const controller of activeGenerations.values()) {
+    controller.abort();
+  }
+  activeGenerations.clear();
+});
+
+module.exports = async function messageAI(sock, msg) {
   const jid = msg?.key?.remoteJid;
   const isStatus = jid?.startsWith("status");
   const isGroup = jid?.endsWith('@g.us');
@@ -78,6 +88,8 @@ module.exports = async function messageAI(sock, msg, polls) {
       }
       return;
     }
+    logger.debug(text, "Received transcript");
+    if (!text) return;
   }
 
   if (isGroup
@@ -91,6 +103,7 @@ module.exports = async function messageAI(sock, msg, polls) {
     }
 
     logger.info("Ignoring text message");
+    logger.debug("Ignoring text message");
     return;
   }
 
@@ -168,6 +181,10 @@ module.exports = async function messageAI(sock, msg, polls) {
   } 
   
   logger.info("Responding...");
+    return;
+  }
+
+  logger.debug("Responding...");
 
   await sock.sendPresenceUpdate('composing', jid);
 
@@ -192,12 +209,13 @@ module.exports = async function messageAI(sock, msg, polls) {
 
     if (controller.signal.aborted) return;
 
-    logger.info("Writing...");
+    logger.debug("Writing...");
 
     let fullResponse = null;
     let lastEdit = Date.now();
     let key = null;
     let hitEnd = false;
+    const groupParticipants = isGroup ? (await sock.groupMetadata(jid))?.participants || [] : [];
     for await (const partial of partialOutputStream) {
       fullResponse = partial;
       logger.debug(partial, "Partial response");
@@ -227,15 +245,14 @@ module.exports = async function messageAI(sock, msg, polls) {
         if (message.text) {
           let mentions = [];
           if (isGroup) {
-            const { participants } = await sock.groupMetadata(jid);
-            participants.forEach(f => {
+            groupParticipants.forEach(f => {
               if (message.text.includes("@" + f.id.split("@")[0]))
               {
                 mentions.push(f.id);
               }
             });
           }
-          logger.info({ message: message.text, mentions }, "AI response");
+          logger.debug({ message: message.text, mentions }, "AI response");
           await sock.sendMessage(jid, { text: message.text, edit: key, mentions });
           assistantMessage(jid, message.text);
           key = null;
@@ -245,11 +262,11 @@ module.exports = async function messageAI(sock, msg, polls) {
           const poll = new Poll(await sock.sendMessage(jid, m));
           poll.onVote = (vote, voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `voted for \"${vote}\" in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, voteMsg, polls);
+            messageAI(sock, voteMsg);
           }
           poll.onUnvote = (voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `unvoted in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, voteMsg, polls);
+            messageAI(sock, voteMsg);
           }
           polls.set(poll.msg.key.id, poll);
           assistantMiscMessage(jid, JSON.stringify(m));
@@ -304,7 +321,7 @@ module.exports = async function messageAI(sock, msg, polls) {
                 return cleanMsg;
               })
             });
-            if (controller.signal.aborted) return logger.info("Aborted");
+            if (controller.signal.aborted) return logger.debug("Aborted");
             const selection = (_output?.selectedIndex - 1) ?? 0;
             const gif = data[selection];
             const url = gif?.images?.original?.mp4;
@@ -318,7 +335,7 @@ module.exports = async function messageAI(sock, msg, polls) {
               await sock.sendMessage(jid, { text: "_Unable to show GIF_" });
             }
             delete gif.images;
-            logger.info(gif, "Selected GIF");
+            logger.debug(gif, "Selected GIF");
             assistantMiscMessage(jid, JSON.stringify({
               type: "gif",
               title: gif.title,
@@ -328,7 +345,6 @@ module.exports = async function messageAI(sock, msg, polls) {
           catch (e) {
             logger.error(e, "Error fetching GIFs");
             await sock.sendMessage(jid, { text: "_No GIF available._" });
-            await sock.sendPresenceUpdate('paused', jid);
           }
         }
       }
@@ -340,11 +356,10 @@ module.exports = async function messageAI(sock, msg, polls) {
     }
 
     logger.error(e, "Error occurred during AI response generation");
-    await sock.sendPresenceUpdate('paused', jid);
     return;
   }
 
-  await sock.sendPresenceUpdate('paused', jid);
+  activeGenerations.delete(jid);
 
   if (activeGenerations.get(jid) === controller) {
     activeGenerations.delete(jid);

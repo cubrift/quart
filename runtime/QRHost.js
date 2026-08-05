@@ -1,6 +1,6 @@
 const express = require('express');
 const QRCode = require('qrcode');
-const { logger } = require('./runtime/Globals');
+const { logger } = require('./Globals');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +36,9 @@ function updateQRHost(qrData) {
   <head>
     <title>QR Code for Quart</title>
     <style>
+      * {
+        font-family: sans-serif;
+      }
       body {
         display: flex;
         flex-direction: column;
@@ -53,24 +56,50 @@ function updateQRHost(qrData) {
     </style>
   </head>
   <body>
-    <img width="500" src="${qrImage}" alt="QR Code" />
+    <img id="qrImage" width="500" src="${qrImage}" alt="QR Code" />
   </body>
   <script>
+    let failureCount = 0;
+    const MAX_FAILURES = 5;
+    let pollInterval;
+
+    function showEndedMessage() {
+      clearInterval(pollInterval);
+
+      document.body.innerHTML = \`
+        <h2>QR session ended</h2>
+        <p>You can close this page or refresh it for a new QR code.</p>
+      \`;
+    }
+
     async function fetchQr() {
       try {
         const res = await fetch('/qr');
         const { qr } = await res.json();
 
+        if (qr === "about:blank") {
+          showEndedMessage();
+          return;
+        }
+
+        failureCount = 0;
+
         if (qr) {
-          document.body.innerHTML = \`<img width="500" src="\${qr}" alt="QR Code" />\`;
+          document.getElementById('qrImage').src = qr;
         }
       } catch (err) {
-        console.error('Error fetching QR:', err);
+        failureCount++;
+
+        if (failureCount >= MAX_FAILURES) {
+          console.warn("QR polling stopped after repeated failures.");
+          showEndedMessage();
+          return;
+        }
       }
     }
 
     fetchQr();
-    setInterval(fetchQr, 1000);
+    pollInterval = setInterval(fetchQr, 1000);
   </script>
 </html>`);
       } catch (err) {

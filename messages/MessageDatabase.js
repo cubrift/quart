@@ -1,6 +1,7 @@
 const Database = require('better-sqlite3');
 const { extractImageData } = require('./Utils');
-const db = new Database('chat_history.db');
+const { DATABASE_PATH } = require('../Config');
+const db = new Database(DATABASE_PATH);
 
 // Create table if it doesn't exist
 db.exec(`
@@ -10,7 +11,9 @@ db.exec(`
     role TEXT NOT NULL,
     content TEXT NOT NULL,
     timestamp INTEGER NOT NULL
-  )
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_messages_jid_id ON messages(jid, id);
 `);
 
 // Save incoming/outgoing text message
@@ -66,12 +69,24 @@ function assistantMiscMessage(jid, content) {
   return assistantMessage(jid, " " + content); // temporary
 }
 
+function deleteMessagesBefore(timestamp) {
+  if (typeof timestamp !== 'number' || !Number.isFinite(timestamp) || timestamp < 0) {
+    throw new TypeError('Invalid timestamp: must be a non-negative finite number');
+  }
+
+  const stmt = db.prepare('DELETE FROM messages WHERE timestamp < ?');
+  const info = stmt.run(timestamp);
+  return info.changes;
+}
+
 module.exports = {
+  db,
   saveMessage,
   userMessage,
   userMiscMessage,
   imageMessage,
   assistantMessage,
   assistantMiscMessage,
-  getRecentHistory
+  getRecentHistory,
+  deleteMessagesBefore
 };
