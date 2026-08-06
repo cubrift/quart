@@ -1,11 +1,9 @@
 const pino = require('pino');
 const pretty = require('pino-pretty');
 
-const isDev = process.env.NODE_ENV !== 'production';
-
 const logger = pino(
   { level: process.env.LOG_LEVEL || 'info' },
-  isDev ? pretty({ colorize: true }) : undefined
+  pretty({ colorize: true })
 );
 
 function handleRejection(reason, promise) {
