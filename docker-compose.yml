@@ -14,4 +14,4 @@ services:
     volumes:                  # LINKS local files on your PC directly into the container!
       - ./.env:/app/.env
       - ./data:/app/data
-      - ./auth_info_baileys:/app/auth_info_baileys
+      - ./auth:/app/auth
