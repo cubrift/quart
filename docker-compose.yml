@@ -11,7 +11,9 @@ services:
     ports:
       - "3000:3000"           # Connects your PC's localhost:3000 -> Container's port 3000
 
-    volumes:                  # LINKS local files on your PC directly into the container!
-      - ./.env:/app/.env
-      - ./data:/app/data
-      - ./auth:/app/auth
+    volumes:
+      - auth:/app/auth
+
+volumes:
+  auth:
+    external: false
