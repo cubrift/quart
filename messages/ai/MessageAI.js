@@ -10,7 +10,7 @@ const { getSystemInstructions, ttsInstructions, gifSelectionSystemInstructions }
 const schema = require("./schemas/AISchema");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
 const { getRealLid, extractImageData } = require('../Utils');
-const { logger } = require('../../runtime/Globals');
+const { logger, shutdownStack } = require('../../runtime/Globals');
 
 const { default: OpenAI } = require('openai');
 const openai = new OpenAI();
