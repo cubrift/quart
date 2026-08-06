@@ -58,7 +58,21 @@ It is built to join conversations naturally, keep track of what is going on, and
 - Node.js v22.12.0 or higher
 - A WhatsApp account
 - An OpenAI API key
-- A Giphy API key
+- A GIPHY API key
+
+## Running with Docker (Recommended)
+
+Run the following command to instantly spin up Quart in a container:
+
+```bash
+sudo docker run \
+  -e OPENAI_API_KEY="your-openai-key" \
+  -e GIPHY_API_KEY="your-giphy-key" \
+  -v auth:/app/auth \
+  cubrift/quart
+```
+
+Then follow the terminal instructions to scan the generated WhatsApp QR code. Authentication sessions will persist safely inside the `auth` named volume.
 
 ## Installation
 
@@ -150,6 +164,7 @@ Feel free to add to the roadmap!
 # Deployment
 
 Quart is lightweight enough to run on a small VPS or other always-on Linux host such as [Wispbyte](https://wispbyte.com/).
+Using Docker is highly recommended for these setups.
 
 A typical deployment flow looks like this:
 
