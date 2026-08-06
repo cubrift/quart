@@ -8,6 +8,7 @@
   },
   "scripts": {
     "setup": "node scripts/setup.js",
+    "quart": "node index.js",
     "test": "node --test",
     "test:should-respond": "node --test test/should-respond/should-respond.test.js",
     "eval:should-respond": "node scripts/evaluate-should-respond.js"
