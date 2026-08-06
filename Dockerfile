@@ -1,7 +1,7 @@
 # ==========================================
 # STAGE 1: Build & Compile Native Dependencies
 # ==========================================
-FROM node:20-alpine AS builder
+FROM node:26-alpine AS builder
 
 # Install build tools required for better-sqlite3 / native modules
 RUN apk add --no-cache python3 make g++ gcc
@@ -26,7 +26,7 @@ RUN npm prune --production
 # ==========================================
 # STAGE 2: Lightweight Production Image
 # ==========================================
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 
 WORKDIR /app
 
