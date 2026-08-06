@@ -1,6 +1,7 @@
 const { program } = require('commander');
 const { version } = require('../package.json');
 const { logger: rootLogger, handleRejection } = require('./Logger');
+const { db } = require('./messages/MessageDatabase');
 
 const logger = rootLogger.child({ module: 'quart' });
 
@@ -61,6 +62,7 @@ module.exports = {
   version,
   shutdownStack,
   logger,
+  db,
   initialize,
   shutdown
 };

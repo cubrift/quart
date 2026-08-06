@@ -23,10 +23,9 @@ const messageAI = require('./messages/ai/MessageAI');
 const crypto = require('crypto');
 const { PHONE_NUMBER, AUTH_DIR } = require("./Config");
 const { getRealLid } = require("./messages/Utils");
-const { logger, initialize, shutdown, shutdownStack } = require("./runtime/Globals");
+const { logger, db, initialize, shutdown, shutdownStack } = require("./runtime/Globals");
 const { updateQRHost, stopQRHost } = require('./runtime/QRHost');
 const { rm } = require('fs/promises');
-const { db } = require('./messages/MessageDatabase');
 const { handlePollMessage } = require('./messages/Poll');
 
 const options = initialize();
@@ -50,7 +49,7 @@ async function startBot() {
   });
 
   shutdownStack.push(
-    sock.end,
+    sock?.end,
     stopQRHost,
     db?.close
   );
