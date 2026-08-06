@@ -1,7 +1,7 @@
 const { program } = require('commander');
 const { version } = require('../package.json');
 const { logger: rootLogger, handleRejection } = require('./Logger');
-const { db } = require('./messages/MessageDatabase');
+const { db } = require('../messages/MessageDatabase');
 
 const logger = rootLogger.child({ module: 'quart' });
 
