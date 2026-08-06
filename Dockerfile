@@ -15,5 +15,8 @@ ENV NODE_ENV=production
 # Copy all pruned application files from builder
 COPY --from=builder /app ./
 
-# Adjust this to match your entry point (e.g., index.js, main.js, bot.js)
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "index.js"]
