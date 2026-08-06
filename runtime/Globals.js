@@ -1,8 +1,8 @@
 const { program } = require('commander');
 const { version } = require('../package.json');
-const { logger, handleRejection } = require('./Logger');
+const { logger: rootLogger, handleRejection } = require('./Logger');
 
-const logger = logger.child({ module: 'quart' });
+const logger = rootLogger.child({ module: 'quart' });
 
 const shutdownStack = [];
 
