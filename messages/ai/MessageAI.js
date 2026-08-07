@@ -348,5 +348,6 @@ module.exports = async function messageAI(sock, msg, polls) {
     logger.error(e, "Error occurred during AI response generation");
     return;
   }
+
   logger.info(await usage, "Usage statistics");
 }
