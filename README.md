@@ -68,11 +68,11 @@ Run the following command to instantly spin up Quart in a container:
 docker run \
   -e OPENAI_API_KEY="your-openai-key" \
   -e GIPHY_API_KEY="your-giphy-key" \
-  -v auth:/app/auth \
+  -v data:/app/data/ \
   cubrift/quart
 ```
 
-Then follow the terminal instructions to scan the generated WhatsApp QR code. Authentication sessions will persist safely inside the `auth` named volume.
+Then follow the terminal instructions to scan the generated WhatsApp QR code. Authentication sessions and the chat history database will persist safely inside the `data` named volume.
 
 ## Installation
 

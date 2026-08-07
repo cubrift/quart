@@ -27,7 +27,7 @@ const color = require('picocolors');
   }
   const auth_dir = await text({
     message: 'Where should the auth state be stored?',
-    initialValue: './auth',
+    initialValue: './data/auth/',
     validate(value) {
       if (!value || value.length === 0) return 'Value is required!';
     }
@@ -38,7 +38,7 @@ const color = require('picocolors');
   
   const database_path = await text({
     message: 'Where should the database be stored?',
-    initialValue: './chat_history.db',
+    initialValue: './data/chat_history.db',
     validate(value) {
       if (!value || value.length === 0) return 'Value is required!';
     }
