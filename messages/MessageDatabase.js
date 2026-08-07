@@ -13,7 +13,7 @@ db.exec(`
     timestamp INTEGER NOT NULL
   );
 
-  CREATE INDEX IF NOT EXISTS idx_messages_jid_id ON messages(jid, id);
+  CREATE INDEX IF NOT EXISTS idx_messages_jid_id ON messages(jid, id DESC);
 `);
 
 // Save incoming/outgoing text message
