@@ -2,7 +2,7 @@ const { generateText, streamText, Output, tool } = require("ai");
 const { createOpenAI, openai: oai } = require('@ai-sdk/openai');
 const { downloadMediaMessage } = require('baileys');
 
-const { Poll } = require('../Poll');
+const { Poll, polls } = require('../Poll');
 const { saveMessage, getRecentHistory, userMessage, imageMessage, userMiscMessage, assistantMiscMessage, assistantMessage } = require('../MessageDatabase');
 const checkShouldRespond = require('./CheckShouldRespond');
 const { RESPONSE_MODEL, EDIT_INTERVAL, CHECK_MODEL, MAX_MESSAGE_CONTEXT, TTS_MODEL, TRANSCRIPTION_MODEL, TTS_VOICE } = require("../../Config");
@@ -10,7 +10,7 @@ const { getSystemInstructions, ttsInstructions, gifSelectionSystemInstructions }
 const schema = require("./schemas/AISchema");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
 const { getRealLid, extractImageData } = require('../Utils');
-const { logger } = require('../../runtime/Globals');
+const { logger, shutdownStack } = require('../../runtime/Globals');
 
 const { default: OpenAI } = require('openai');
 const openai = new OpenAI();
@@ -21,7 +21,14 @@ const model = createOpenAI({
 
 const activeGenerations = new Map();
 
-module.exports = async function messageAI(sock, msg, polls) {
+shutdownStack.push(() => {
+  for (const controller of activeGenerations.values()) {
+    controller.abort();
+  }
+  activeGenerations.clear();
+});
+
+module.exports = async function messageAI(sock, msg) {
   const jid = msg?.key?.remoteJid;
   const isStatus = jid?.startsWith("status");
   const isGroup = jid?.endsWith('@g.us');
@@ -65,15 +72,14 @@ module.exports = async function messageAI(sock, msg, polls) {
   let transcript = null;
 
   if (msg.message.audioMessage) {
-    const { text } = await openai.audio.transcriptions.create({
+const { text } = await openai.audio.transcriptions.create({
       file: await OpenAI.toFile(await downloadMediaMessage(msg, "buffer"), "input.ogg"),
       model: TRANSCRIPTION_MODEL,
     }, { signal: controller.signal });
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
-    logger.debug(text, "Recieved transcript");
-    if (!text) return;
-  }
+    logger.debug(text, "Received transcript");
+    if (!text) return;  }
 
   if (isGroup
       && !transcript
@@ -148,6 +154,7 @@ module.exports = async function messageAI(sock, msg, polls) {
     let lastEdit = Date.now();
     let key = null;
     let hitEnd = false;
+    const groupParticipants = isGroup ? (await sock.groupMetadata(jid))?.participants || [] : [];
     for await (const partial of partialOutputStream) {
       fullResponse = partial;
       logger.debug(partial, "Partial response");
@@ -177,8 +184,7 @@ module.exports = async function messageAI(sock, msg, polls) {
         if (message.text) {
           let mentions = [];
           if (isGroup) {
-            const { participants } = await sock.groupMetadata(jid);
-            participants.forEach(f => {
+            groupParticipants.forEach(f => {
               if (message.text.includes("@" + f.id.split("@")[0]))
               {
                 mentions.push(f.id);
@@ -195,11 +201,11 @@ module.exports = async function messageAI(sock, msg, polls) {
           const poll = new Poll(await sock.sendMessage(jid, m));
           poll.onVote = (vote, voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `voted for \"${vote}\" in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, voteMsg, polls);
+            messageAI(sock, voteMsg);
           }
           poll.onUnvote = (voteMsg) => {
             userMiscMessage(jid, voteMsg, "Voter", `unvoted in Quart's poll \"${message.poll.name}\"`);
-            messageAI(sock, voteMsg, polls);
+            messageAI(sock, voteMsg);
           }
           polls.set(poll.msg.key.id, poll);
           assistantMiscMessage(jid, JSON.stringify(m));
@@ -287,6 +293,8 @@ module.exports = async function messageAI(sock, msg, polls) {
     logger.error(e, "Error occurred during AI response generation");
     return;
   }
+
+  activeGenerations.delete(jid);
 
   logger.info(await usage, "Usage statistics");
 }
