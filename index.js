@@ -18,13 +18,15 @@ const {
 const pino = require("pino");
 const qrcode = require("qrcode-terminal");
 
-const messageAI = require('./messages/ai/MessageAI');
-
+const { rm } = require('fs/promises');
+const { mkdirSync } = require('fs');
 const { PHONE_NUMBER, AUTH_DIR } = require("./Config");
+mkdirSync(AUTH_DIR, { recursive: true });
+
+const messageAI = require('./messages/ai/MessageAI');
 const { getRealLid } = require("./messages/Utils");
 const { logger, db, initialize, shutdown, shutdownStack } = require("./runtime/Globals");
 const { updateQRHost, stopQRHost } = require('./runtime/QRHost');
-const { rm } = require('fs/promises');
 const { handlePollMessage } = require('./messages/Poll');
 
 const options = initialize();
