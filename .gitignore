@@ -1,7 +1,8 @@
 node_modules
+data
 auth
 tmp
-chat_history*
+chat_history.db
 old.js
 .env
 _!*
