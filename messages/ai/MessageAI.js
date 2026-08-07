@@ -295,7 +295,5 @@ module.exports = async function messageAI(sock, msg) {
     return;
   }
 
-  activeGenerations.delete(jid);
-
   logger.info(await usage, "Usage statistics");
 }
