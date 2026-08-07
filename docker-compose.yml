@@ -1,0 +1,19 @@
+services:
+  quart:                      # The internal name of this service inside Compose
+    build: .                  # "Look in the current folder for the Dockerfile to build this"
+    container_name: quart     # "Name the running container 'quart'"
+    restart: unless-stopped   # "If it crashes or your PC reboots, automatically restart it"
+    
+    # Required for interactive terminal mode & terminal QR code rendering:
+    tty: true                 # Gives the container a virtual terminal window
+    stdin_open: true          # Keeps the input stream open so you can type into it
+
+    ports:
+      - "3000:3000"           # Connects your PC's localhost:3000 -> Container's port 3000
+
+    volumes:
+      - auth:/app/auth
+
+volumes:
+  auth:
+    external: false

@@ -1,9 +1,28 @@
 const { program } = require('commander');
 const { version } = require('../package.json');
-const { logger, handleRejection } = require('./Logger');
+const { logger: rootLogger, handleRejection } = require('./Logger');
+const { db } = require('../messages/MessageDatabase');
+
+const logger = rootLogger.child({ module: 'quart' });
+
+const shutdownStack = [];
+
+function shutdown() {
+  logger.info('Shutting down...');
+  for (const shutdownFunc of shutdownStack) {
+    if (!shutdownFunc) continue;
+    try {
+      shutdownFunc();
+    } catch (err) {
+      logger.error(err, 'Error during shutdown');
+      process.exit(1);
+    }
+  }
+  process.exit(0);
+}
 
 function validateEnv() {
-  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY', 'AUTH_DIR', 'DATABASE_PATH'];
+  const requiredEnvVars = ['OPENAI_API_KEY', 'GIPHY_API_KEY'];
   const missingVars = requiredEnvVars.filter(
     (key) => !process.env[key] || !process.env[key].trim()
   );
@@ -41,6 +60,9 @@ function initialize() {
 
 module.exports = {
   version,
-  logger: logger.child({ module: 'quart' }),
+  shutdownStack,
+  logger,
+  db,
   initialize,
+  shutdown
 };

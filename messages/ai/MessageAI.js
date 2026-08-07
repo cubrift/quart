@@ -72,14 +72,15 @@ module.exports = async function messageAI(sock, msg) {
   let transcript = null;
 
   if (msg.message.audioMessage) {
-const { text } = await openai.audio.transcriptions.create({
+    const { text } = await openai.audio.transcriptions.create({
       file: await OpenAI.toFile(await downloadMediaMessage(msg, "buffer"), "input.ogg"),
       model: TRANSCRIPTION_MODEL,
     }, { signal: controller.signal });
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
     logger.debug(text, "Received transcript");
-    if (!text) return;  }
+    if (!text) return;
+  }
 
   if (isGroup
       && !transcript
