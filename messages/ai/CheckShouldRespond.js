@@ -38,6 +38,7 @@ module.exports = async function checkShouldRespond(model, messages, abortControl
   } catch (error) {
     logger.error(error, 'Error occurred while checking if response is needed');
     if (abortController.signal.aborted || retries <= 0) return false;
-    return checkShouldRespond(model, messages, abortController, retries - 1);
+    abortController = new AbortController;
+    return checkShouldRespond(model, messages, controller, retries - 1);
   }
 }
