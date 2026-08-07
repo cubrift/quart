@@ -10,7 +10,7 @@ const { getSystemInstructions, ttsInstructions, gifSelectionSystemInstructions }
 const schema = require("./schemas/AISchema");
 const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
 const { getRealLid, extractImageData } = require('../Utils');
-const { logger } = require('../../runtime/Globals');
+const { logger, shutdownStack } = require('../../runtime/Globals');
 
 const activeGenerations = new Map();
 
@@ -21,9 +21,6 @@ const model = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-module.exports = async function messageAI(sock, msg, polls) {
-const activeGenerations = new Map();
-
 shutdownStack.push(() => {
   for (const controller of activeGenerations.values()) {
     controller.abort();
@@ -31,7 +28,7 @@ shutdownStack.push(() => {
   activeGenerations.clear();
 });
 
-module.exports = async function messageAI(sock, msg) {
+module.exports = async function messageAI(sock, msg, polls) {
   const jid = msg?.key?.remoteJid;
   const isStatus = jid?.startsWith("status");
   const isGroup = jid?.endsWith('@g.us');
@@ -81,15 +78,13 @@ module.exports = async function messageAI(sock, msg) {
     }, { signal: controller.signal });
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
-    logger.info(text, "Recieved transcript");
+    logger.debug(text, "Received transcript");
     if (!text) {
       if (activeGenerations.get(jid) === controller) {
         activeGenerations.delete(jid);
       }
       return;
     }
-    logger.debug(text, "Received transcript");
-    if (!text) return;
   }
 
   if (isGroup
@@ -102,7 +97,6 @@ module.exports = async function messageAI(sock, msg) {
       activeGenerations.delete(jid);
     }
 
-    logger.info("Ignoring text message");
     logger.debug("Ignoring text message");
     return;
   }
@@ -179,10 +173,6 @@ module.exports = async function messageAI(sock, msg) {
       throw e;
     }
   } 
-  
-  logger.info("Responding...");
-    return;
-  }
 
   logger.debug("Responding...");
 
@@ -359,7 +349,7 @@ module.exports = async function messageAI(sock, msg) {
     return;
   }
 
-  activeGenerations.delete(jid);
+  await sock.sendPresenceUpdate("paused", jid);
 
   if (activeGenerations.get(jid) === controller) {
     activeGenerations.delete(jid);
