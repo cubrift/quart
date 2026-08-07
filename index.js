@@ -20,7 +20,6 @@ const qrcode = require("qrcode-terminal");
 
 const messageAI = require('./messages/ai/MessageAI');
 
-const crypto = require('crypto');
 const { PHONE_NUMBER, AUTH_DIR } = require("./Config");
 const { getRealLid } = require("./messages/Utils");
 const { logger, db, initialize, shutdown, shutdownStack } = require("./runtime/Globals");
@@ -29,13 +28,6 @@ const { rm } = require('fs/promises');
 const { handlePollMessage } = require('./messages/Poll');
 
 const options = initialize();
-
-function getOptionHash(optionName) {
-  return crypto
-    .createHash("sha256")
-    .update(optionName)
-    .digest();
-}
 
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
