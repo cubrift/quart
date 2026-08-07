@@ -1,3 +1,8 @@
+const crypto = require('crypto');
+
+const { decryptPollVote } = require("baileys");
+const { getRealLid } = require("./Utils");
+
 const polls = new Map();
 
 class Poll {
@@ -8,6 +13,13 @@ class Poll {
   constructor(msg) {
     this.msg = msg;
   }
+}
+
+function getOptionHash(optionName) {
+  return crypto
+    .createHash("sha256")
+    .update(optionName)
+    .digest();
 }
 
 function handlePollMessage(sock, msg) {
