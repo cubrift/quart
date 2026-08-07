@@ -12,14 +12,14 @@ const AIChooseGIFSchema = require('./schemas/AIChooseGIFSchema');
 const { getRealLid, extractImageData } = require('../Utils');
 const { logger, shutdownStack } = require('../../runtime/Globals');
 
+const activeGenerations = new Map();
+
 const { default: OpenAI } = require('openai');
 const openai = new OpenAI();
 
 const model = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
-
-const activeGenerations = new Map();
 
 shutdownStack.push(() => {
   for (const controller of activeGenerations.values()) {
@@ -28,7 +28,7 @@ shutdownStack.push(() => {
   activeGenerations.clear();
 });
 
-module.exports = async function messageAI(sock, msg) {
+module.exports = async function messageAI(sock, msg, polls) {
   const jid = msg?.key?.remoteJid;
   const isStatus = jid?.startsWith("status");
   const isGroup = jid?.endsWith('@g.us');
@@ -79,7 +79,12 @@ module.exports = async function messageAI(sock, msg) {
     transcript = text;
     messages.push({ role: "user", content: userMiscMessage(jid, msg, "🎙 User", "sent a voice note with the following transcript: " + text) });
     logger.debug(text, "Received transcript");
-    if (!text) return;
+    if (!text) {
+      if (activeGenerations.get(jid) === controller) {
+        activeGenerations.delete(jid);
+      }
+      return;
+    }
   }
 
   if (isGroup
@@ -87,42 +92,87 @@ module.exports = async function messageAI(sock, msg) {
       && !msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(getRealLid(sock.user.lid))
       && !msg.message?.extendedTextMessage?.contextInfo?.nonJidMentions
       && !await checkShouldRespond(model, messages, controller)) {
-    if (activeGenerations.get(jid) === controller)
+    
+    if (activeGenerations.get(jid) === controller) {
       activeGenerations.delete(jid);
+    }
+
     logger.debug("Ignoring text message");
     return;
   }
 
   if (msg.message.audioMessage) {
-    await sock.sendPresenceUpdate('recording', jid);
+    try {
+      await sock.sendPresenceUpdate('recording', jid);
 
-    const res = await openai.chat.completions.create({
-      model: TTS_MODEL,
-      modalities: ["text", "audio"],
-      audio: { voice: TTS_VOICE, format: "opus" },
-      messages: [
-        ...messages,
+      const res = await openai.chat.completions.create(
         {
-          role: "user",
-          content: transcript,
+          model: TTS_MODEL,
+          modalities: ["text", "audio"],
+          audio: { voice: TTS_VOICE, format: "opus" },
+          messages: [
+            ...messages,
+            {
+              role: "user",
+              content: transcript,
+            },
+          ]
         },
-      ]
-    });
+        {
+          signal: controller.signal
+        }
+      );
 
-    if (res?.choices?.[0]) {
-      const audioBuffer = Buffer.from(res.choices[0].message.audio.data, 'base64');
-      assistantMiscMessage(jid, transcript);
+      if (controller.signal.aborted) {
+        await sock.sendPresenceUpdate('paused', jid);
 
-      await sock.sendMessage(jid, {
-        audio: audioBuffer,
-        mimetype: 'audio/ogg; codecs=opus',
-        ptt: true
-      });
-    } else {
-      logger.error("No audio data returned from the model.");
+        if (activeGenerations.get(jid) === controller) {
+          activeGenerations.delete(jid);
+        }
+
+        return;
+      }
+
+      if (res?.choices?.[0]) {
+        const audioBuffer = Buffer.from(res.choices[0].message.audio.data, 'base64');
+        
+        assistantMiscMessage(jid, transcript);
+
+        await sock.sendMessage(jid, {
+          audio: audioBuffer,
+          mimetype: 'audio/ogg; codecs=opus',
+          ptt: true
+        });
+      } else {
+        logger.error("No audio data returned from the model.");
+      }
+
+      await sock.sendPresenceUpdate('paused', jid);
+
+      if (activeGenerations.get(jid) === controller) {
+        activeGenerations.delete(jid);
+      }
+
+      return;
     }
-    return;
-  }
+    catch (e) {
+      if (controller.signal.aborted) {
+        await sock.sendPresenceUpdate('paused', jid);
+
+        if (activeGenerations.get(jid) === controller) {
+          activeGenerations.delete(jid);
+        }
+
+        return;
+      }
+
+      if (activeGenerations.get(jid) === controller) {
+        activeGenerations.delete(jid);
+      }
+
+      throw e;
+    }
+  } 
 
   logger.debug("Responding...");
 
@@ -291,6 +341,10 @@ module.exports = async function messageAI(sock, msg) {
     }
   }
   catch (e) {
+    if (activeGenerations.get(jid) === controller) {
+      activeGenerations.delete(jid);
+    }
+
     logger.error(e, "Error occurred during AI response generation");
     return;
   }
