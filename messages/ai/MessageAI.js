@@ -348,12 +348,5 @@ module.exports = async function messageAI(sock, msg, polls) {
     logger.error(e, "Error occurred during AI response generation");
     return;
   }
-
-  await sock.sendPresenceUpdate("paused", jid);
-
-  if (activeGenerations.get(jid) === controller) {
-    activeGenerations.delete(jid);
-  }
-
   logger.info(await usage, "Usage statistics");
 }
