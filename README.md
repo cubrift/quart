@@ -65,7 +65,7 @@ It is built to join conversations naturally, keep track of what is going on, and
 Run the following command to instantly spin up Quart in a container:
 
 ```bash
-sudo docker run \
+docker run \
   -e OPENAI_API_KEY="your-openai-key" \
   -e GIPHY_API_KEY="your-giphy-key" \
   -v auth:/app/auth \
