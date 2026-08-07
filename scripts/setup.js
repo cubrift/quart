@@ -43,7 +43,7 @@ const color = require('picocolors');
       if (!value || value.length === 0) return 'Value is required!';
     }
   });
-  if (isCancel(auth_dir)) {
+  if (isCancel(database_path)) {
     return cancel('Auth directory is required to run Quart.');
   }
   if (existsSync('.env')) {
