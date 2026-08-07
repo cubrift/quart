@@ -1,6 +1,6 @@
 const { downloadMediaMessage } = require("baileys");
 
-const getRealLid = lid => lid.replace(/:\d+@lid$/, '@lid');
+const getRealLid = lid => lid?.replace(/:\d+@lid$/, '@lid') ?? "";
 
 async function extractImageData(msg) {
   const directImage = msg.message?.imageMessage;
