@@ -51,6 +51,7 @@ function loadBaselinePrompt() {
 
 function resolvePromptSelection(argv = process.argv.slice(2)) {
   let promptMode = "revised";
+  let live = false;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--prompt") {
@@ -66,6 +67,10 @@ function resolvePromptSelection(argv = process.argv.slice(2)) {
       promptMode = arg.slice("--prompt=".length);
       continue;
     }
+    if (arg === "--live") {
+      live = true;
+      continue;
+    }
     if (arg === "--help" || arg === "-h") {
       return { promptMode: "help" };
     }
@@ -76,7 +81,7 @@ function resolvePromptSelection(argv = process.argv.slice(2)) {
     throw new Error(`Invalid --prompt value "${promptMode}" (expected baseline|revised)`);
   }
 
-  return { promptMode };
+  return { promptMode, live };
 }
 
 function selectSystemPrompt(promptMode) {
@@ -305,16 +310,18 @@ async function runLiveEvaluation(promptInfo) {
 
 function printHelp() {
   console.log(`Usage:
-  npm run eval:should-respond -- [--prompt baseline|revised]
+  npm run eval:should-respond -- [--prompt baseline|revised] [--live]
 
-Offline always runs. Live model evaluation runs only when OPENAI_API_KEY is set.
+  Offline mode (default): runs scenario/prompt validation only. Never makes API calls.
+  Live mode (--live): additionally runs live model evaluation via OPENAI_API_KEY.
+  If --live is passed without OPENAI_API_KEY set, live evaluation is skipped with a warning.
 
-Both prompt modes share scenarios, model, temperature=0, context builder, and schema.
-Only the system prompt text changes. baseline-prompt.txt is never modified.`);
+  Both prompt modes share scenarios, model, temperature=0, context builder, and schema.
+ Only the system prompt text changes. baseline-prompt.txt is never modified.`);
 }
 
 async function main(argv = process.argv.slice(2)) {
-  const { promptMode } = resolvePromptSelection(argv);
+  const { promptMode, live } = resolvePromptSelection(argv);
   if (promptMode === "help") {
     printHelp();
     return;
@@ -322,7 +329,10 @@ async function main(argv = process.argv.slice(2)) {
 
   const promptInfo = selectSystemPrompt(promptMode);
   printOfflineReport(promptInfo);
-  await runLiveEvaluation(promptInfo);
+
+  if (live) {
+    await runLiveEvaluation(promptInfo);
+  }
 }
 
 if (require.main === module) {
