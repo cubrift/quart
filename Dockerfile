@@ -15,4 +15,5 @@ COPY . .
 
 RUN npm link
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "index.js"]
